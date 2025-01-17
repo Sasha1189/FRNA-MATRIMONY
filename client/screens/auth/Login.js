@@ -32,7 +32,7 @@ const Login = ({ navigation }) => {
       //store data to local
       await AsyncStorage.setItem("@auth", JSON.stringify(data));
       alert(data && data.message);
-      navigation.navigate("Home");
+      navigation.navigate("HomeScreen");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||

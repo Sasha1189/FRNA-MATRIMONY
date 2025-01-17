@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import IconButton from "./IconButton";
+import ImageCarousal from "./ImageCarousal";
 
 const { width, height } = Dimensions.get("window");
 const ITEMSIZE = width * 0.95;
@@ -17,19 +18,14 @@ const COLORS = {
   star: "#07A6FF",
 };
 
-const VideoCard = ({ imageUri }) => {
+const VideoCard = ({ item }) => {
   return (
-    <TouchableOpacity activeOpacity={0.7}>
-      <Image
-        source={{ uri: imageUri }}
-        style={{
-          width: width,
-          height: height,
-          borderRadius: 20,
-          zIndex: -999,
-        }}
-        resizeMode="cover"
-      />
+    <View style={styles.cardContainer}>
+      <View style={styles.videoCard}>
+        <ImageCarousal
+        // images={item.images}
+        />
+      </View>
       <View style={styles.userContainer}>
         <Text style={styles.nav}>Ruchika 22</Text>
         <Text style={styles.location}>Accenture</Text>
@@ -40,17 +36,34 @@ const VideoCard = ({ imageUri }) => {
         <IconButton name="commenting-o" size={24} color={COLORS.star} />
         <IconButton name="info" size={24} color={COLORS.like} />
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
 export default VideoCard;
 
 const styles = StyleSheet.create({
+  cardContainer: {
+    width: width,
+    height: height * 0.9,
+    borderRadius: 20,
+    overflow: "hidden",
+    alignSelf: "center",
+  },
+  videoCard: {
+    width: width,
+    height: height * 0.9, // Occupy most of the screen
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
   userContainer: {
     position: "absolute",
-    bottom: 20,
-    left: 24,
+    bottom: 80,
+    left: 20,
   },
   nav: {
     fontSize: 25,
@@ -69,11 +82,11 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     position: "absolute",
-    width: width,
-    bottom: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "black",
-    left: width - 70,
+    flexDirection: "column",
+    justifyContent: "space-around",
+    alignItems: "center",
+    height: "30%",
+    bottom: 20,
+    right: 20,
   },
 });

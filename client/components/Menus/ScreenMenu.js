@@ -4,11 +4,12 @@ import Home from "../../screens/Home";
 import Register from "../../screens/auth/Register";
 import Login from "../../screens/auth/Login";
 import { AuthContext } from "../../context/authContext";
-import HeaderMenu from "./HeaderMenu";
 import Post from "../../screens/Post";
 import Myposts from "../../screens/Myposts";
 import Account from "../../screens/Account";
 import HomeScreen from "../../screens/HomeScreen";
+import ImageCarousal from "../SubComp/ImageCarousal";
+import Profile from "../../screens/Profile";
 
 const ScreenMenu = () => {
   // Access the global state
@@ -21,39 +22,39 @@ const ScreenMenu = () => {
       {authenticatedUser ? (
         <>
           <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{
-              headerShown: false,
-              // title: "Full Stack App",
-              // headerRight: () => <HeaderMenu />,
-            }}
-          />
-          <Stack.Screen
             name="HomeScreen"
             component={HomeScreen}
             options={{
               headerShown: false,
-              // headerBackTitle: "Back",
-              // headerRight: () => <HeaderMenu />,
             }}
           />
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{
+              headerShown: false,
+            }}
+          />
+
           <Stack.Screen
             name="Myposts"
             component={Myposts}
             options={{
-              headerShown: false,
-              // headerBackTitle: "Back",
-              // headerRight: () => <HeaderMenu />,
+              headerShown: true,
             }}
           />
           <Stack.Screen
             name="Account"
             component={Account}
             options={{
-              headerShown: false,
-              // headerBackTitle: "Back",
-              // headerRight: () => <HeaderMenu />,
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{
+              headerShown: true,
             }}
           />
         </>

@@ -1,0 +1,8 @@
+error and warnings to be handled
+1.  video card component on homescreen
+VirtualizedList: You have a large list that is slow to 
+    update - make sure your renderItem function renders components 
+    that follow React performance best practices like PureComponent, shouldComponentUpdate, 
+    etc. {"contentLength": 6480, "dt": 814, "prevDt": 910}
+
+2.

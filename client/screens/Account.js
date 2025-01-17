@@ -9,9 +9,8 @@ import {
 } from "react-native";
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/authContext";
-import FooterMenu from "../components/Menus/FooterMenu";
 import axios from "axios";
-import HeaderMenu from "../components/Menus/HeaderMenu";
+import Footer from "../components/Menus/Footer";
 const Account = () => {
   //global state
   const [state, setState] = useContext(AuthContext);
@@ -43,9 +42,6 @@ const Account = () => {
   };
   return (
     <View style={styles.container}>
-      <View style={{ backgroundColor: "#ffffff" }}>
-        <HeaderMenu />
-      </View>
       <ScrollView>
         <View style={{ alignItems: "center" }}>
           <Image
@@ -92,15 +88,15 @@ const Account = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <View style={styles.header}>
+        <Footer />
+      </View>
     </View>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 10,
-    justifyContent: "space-between",
-    marginTop: 40,
   },
   inputContainer: {
     marginTop: 20,
@@ -134,6 +130,10 @@ const styles = StyleSheet.create({
   updatedBtnText: {
     color: "#ffffff",
     fontSize: 16,
+  },
+  header: {
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
 });
 export default Account;

@@ -3,25 +3,37 @@ import React, { useEffect, useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import VideoCard from "../components/SubComp/VideoCard";
 import EmptyList from "../components/SubComp/EmptyList";
-import HeaderMenu from "../components/Menus/HeaderMenu";
+import Footer from "../components/Menus/Footer";
+
+const { height, width } = Dimensions.get("window");
 
 const DATA = [
   {
     id: "1",
-    imageUri:
+    images: [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVvpbwvlsBuK-oz1H9oPa5s4Yfx2MJAPph9w&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMgn5ptL4lS38EOu7ooPOmUzSZmyEkmu89bg&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsmW8qnrjPjrBAv5QkP2DJIU5Muy-LWQptnA&s",
+    ],
+
     caption: "Beautiful Sunset",
   },
   {
     id: "2",
-    imageUri:
+    images: [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWXh5ZK-oALZvFBFKEJ6e7IyKKgyx9hm-t7g&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrGnOzNsyvytROgL7iu9Je9YRuSEBAPkTDzQ&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOkOKsKk_Mk9dqDR0Iqkr8tcmWlJorRwYatw&s",
+    ],
     caption: "Mountain Adventure",
   },
   {
     id: "3",
-    imageUri:
+    images: [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwNWb3ZZDtEOH8S-SAzbp20isaFGuNOg51bQ&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToA5egJYawjmoibG30ksrnHCEYc2sW6Ym1MQ&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRimP40ZfDxfoFIhof-9Hwff8Ff0CMstHnhbA&s",
+    ],
     caption: "City Lights",
   },
   {
@@ -68,7 +80,7 @@ const DATA = [
   },
 ];
 
-const Home = () => {
+const HomeScreen = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleViewableItemsChanged = useRef(({ viewableItems }) => {
@@ -80,13 +92,11 @@ const Home = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ backgroundColor: "#115", justifyContent: "flex-start" }}>
-        <HeaderMenu />
-      </View>
       <FlatList
         data={DATA}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <VideoCard imageUri={item.imageUri} />}
+        renderItem={({ item }) => <VideoCard item={item} />}
+        contentContainerStyle={styles.listContainer}
         pagingEnabled
         snapToAlignment="center"
         decelerationRate="fast"
@@ -102,6 +112,9 @@ const Home = () => {
           />
         )}
       />
+      <View style={styles.footer}>
+        <Footer />
+      </View>
     </SafeAreaView>
   );
 };
@@ -109,9 +122,17 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // margin: 10,
-    // justifyContent: "space-between",
+    backgroundColor: "#000",
+  },
+  footer: {
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  listContainer: {
+    // paddingBottom: 20,
+    borderWidth: 1,
+    borderColor: "red",
   },
 });
 
-export default Home;
+export default HomeScreen;
