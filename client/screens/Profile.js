@@ -58,7 +58,7 @@ const Profile = () => {
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.buttonText}>Biodata</Text>
+              <Text style={styles.buttonText}>Add Biodata</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate("Setting")}
