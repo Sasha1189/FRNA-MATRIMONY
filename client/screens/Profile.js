@@ -8,9 +8,12 @@ import {
   StyleSheet,
 } from "react-native";
 import { images, icons } from "../constants";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Footer from "../components/Menus/Footer";
 
 const Profile = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mainContent}>
@@ -30,7 +33,7 @@ const Profile = () => {
         {/* Buttons Section */}
         <View style={styles.buttonsSection}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("addImages")}
+            onPress={() => navigation.navigate("AddImages")}
             style={styles.buttonWrapper}
           >
             <View style={styles.iconContainer}>
@@ -44,20 +47,24 @@ const Profile = () => {
             <Text style={styles.buttonText}>Add Images</Text>
           </TouchableOpacity>
           <View style={styles.horizontalButtons}>
-            <TouchableOpacity style={styles.buttonWrapper}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Biodata")}
+              style={styles.buttonWrapper}
+            >
               <View style={styles.iconContainer}>
-                {/* Uncomment and use when the icon is available */}
                 <Image
                   source={require("../assets/icons/usered.png")}
                   style={styles.icon}
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.buttonText}>Edit Profile</Text>
+              <Text style={styles.buttonText}>Biodata</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonWrapper}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Setting")}
+              style={styles.buttonWrapper}
+            >
               <View style={styles.iconContainer}>
-                {/* Uncomment and use when the icon is available */}
                 <Image
                   source={require("../assets/icons/set.png")}
                   style={styles.icon}
@@ -139,7 +146,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderWidth: 2,
-    borderColor: "#FF8C42",
+    borderColor: "#333333",
     borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
@@ -176,7 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF8C42",
     borderRadius: 30,
     borderWidth: 2,
-    borderColor: "#A6A6C1",
+    // borderColor: "#A6A6C1",
   },
   subscribeText: {
     fontSize: 18,

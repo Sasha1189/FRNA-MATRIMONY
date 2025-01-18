@@ -8,8 +8,10 @@ import Post from "../../screens/Post";
 import Myposts from "../../screens/Myposts";
 import Account from "../../screens/Account";
 import HomeScreen from "../../screens/HomeScreen";
-import ImageCarousal from "../SubComp/ImageCarousal";
 import Profile from "../../screens/Profile";
+import Biodata from "../../screens/subScreens/Biodata";
+import Setting from "../../screens/subScreens/Setting";
+import AddImages from "../../screens/subScreens/AddImages";
 
 const ScreenMenu = () => {
   // Access the global state
@@ -32,7 +34,7 @@ const ScreenMenu = () => {
             name="Home"
             component={Home}
             options={{
-              headerShown: false,
+              headerShown: true,
             }}
           />
 
@@ -53,6 +55,27 @@ const ScreenMenu = () => {
           <Stack.Screen
             name="Profile"
             component={Profile}
+            options={{
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="AddImages"
+            component={AddImages}
+            options={{
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="Biodata"
+            component={Biodata}
+            options={{
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="Setting"
+            component={Setting}
             options={{
               headerShown: true,
             }}
