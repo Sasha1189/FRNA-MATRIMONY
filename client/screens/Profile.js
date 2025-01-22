@@ -18,9 +18,11 @@ const Profile = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.mainContent}>
         {/* Profile Section */}
-        <View style={styles.profileSection}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("MyProfile")}
+          style={styles.profileSection}
+        >
           <View style={styles.profileImageContainer}>
-            {/* Uncomment and use when the image is available */}
             <Image
               source={require("../assets/images/profile.png")}
               style={styles.profileImage}
@@ -28,8 +30,7 @@ const Profile = () => {
             />
           </View>
           <Text style={styles.profileName}>Swaraj, 24</Text>
-        </View>
-
+        </TouchableOpacity>
         {/* Buttons Section */}
         <View style={styles.buttonsSection}>
           <TouchableOpacity
@@ -37,7 +38,6 @@ const Profile = () => {
             style={styles.buttonWrapper}
           >
             <View style={styles.iconContainer}>
-              {/* Uncomment and use when the icon is available */}
               <Image
                 source={require("../assets/icons/camera.png")}
                 style={styles.icon}

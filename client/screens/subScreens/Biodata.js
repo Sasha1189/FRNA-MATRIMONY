@@ -1,140 +1,390 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-import React, { useContext, useState } from "react";
-import { AuthContext } from "../../context/authContext";
-import axios from "axios";
-import Footer from "../../components/Menus/Footer";
+import { useState } from "react";
+import { View, Text, Alert, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Picker } from "@react-native-picker/picker";
+import FormField from "../../components/Forms/FormField";
+import SubmitButton from "../../components/Forms/SubmitButton";
+
+const districts = [
+  "Ahmednagar",
+  "Akola",
+  "Amravati",
+  "Aurangabad",
+  "Beed",
+  "Bhandara",
+  "Buldhana",
+  "Chandrapur",
+  "Dhule",
+  "Gadchiroli",
+  "Gondia",
+  "Hingoli",
+  "Jalgaon",
+  "Jalna",
+  "Kolhapur",
+  "Latur",
+  "Mumbai City",
+  "Mumbai Suburban",
+  "Nagpur",
+  "Nanded",
+  "Nandurbar",
+  "Nashik",
+  "Osmanabad",
+  "Palghar",
+  "Parbhani",
+  "Pune",
+  "Raigad",
+  "Ratnagiri",
+  "Sangli",
+  "Satara",
+  "Sindhudurg",
+  "Solapur",
+  "Thane",
+  "Wardha",
+  "Washim",
+  "Yavatmal",
+];
+
+const maritalStatuses = ["Single", "Divorced", "Widowed"];
+const incomeOptions = ["Less than 10 Lakh", "More than 10 Lakh"];
 
 const Biodata = () => {
-  //global state
-  const [state, setState] = useContext(AuthContext);
-  const { user, token } = state;
-  //local state
-  const [name, setName] = useState(user?.name);
-  const [password, setPassword] = useState(user?.password);
-  const [email] = useState(user?.email);
   const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    fullname: "",
+    aboutme: "",
+    work: "",
+    education: "",
+    livesin: "",
+    hometown: "",
+    hobies: "",
+    height: "",
+    maritalStatus: "",
+    income: "",
+    familyDetails: "",
+    partnerExpectations: "",
+  });
 
-  //handle update user data
-  const handleUpdate = async () => {
+  const saveBiodataToLocal = async (form) => {
+    setLoading(true);
+    const isEmptyField = Object.values(form).some((value) => !value);
+    if (isEmptyField) {
+      setLoading(false);
+      return Alert.alert("Error", "Please fill out all fields.");
+    }
+
     try {
-      setLoading(true);
-      const { data } = await axios.put("/auth/update-user", {
-        name,
-        password,
-        email,
-      });
-      setLoading(false);
-      let UD = JSON.stringify(data);
-      setState({ ...state, user: UD?.updatedUser });
-      alert(data && data.message);
+      await AsyncStorage.setItem("storedBiodata", JSON.stringify(form));
+      Alert.alert("Success", "Biodata saved to local storage!");
     } catch (error) {
-      alert(error.responce.data.message);
       setLoading(false);
-      console.log(error);
+      Alert.alert("Error", "Failed to save biodata.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+      setForm({
+        fullname: "",
+        aboutme: "",
+        work: "",
+        education: "",
+        livesin: "",
+        hometown: "",
+        hobies: "",
+        height: "",
+        maritalStatus: "",
+        income: "",
+        familyDetails: "",
+        partnerExpectations: "",
+      });
     }
   };
+
+  const submit = async () => {
+    const isEmptyField = Object.values(form).some((value) => !value);
+    if (isEmptyField) {
+      return Alert.alert("Error", "Please fill out all fields.");
+    }
+
+    try {
+      // Example API call
+      await createVideoPost({
+        ...form,
+        // userId: user.$id, // Assuming user context is available
+      });
+
+      Alert.alert("Success", "Profile updated successfully!");
+      // router.push("/home");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setForm({
+        fullname: "",
+        work: "",
+        education: "",
+        livesin: "",
+        hometown: "",
+        aboutme: "",
+        hobies: "",
+        height: "",
+        maritalStatus: "",
+        income: "",
+        familyDetails: "",
+        partnerExpectations: "",
+      });
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <ScrollView>
-        <View style={{ alignItems: "center" }}>
-          <Image
-            source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw9-MeiIyc5v6GnRUyZxqT-GMLqOs3KViTHg&s",
-            }}
-            style={{ height: 180, width: 180, borderRadius: 90 }}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Update your biodata here...</Text>
+        </View>
+        {[
+          {
+            title: "Full Name",
+            value: "fullname",
+            placeholder: "Write your full name...",
+          },
+          {
+            title: "About me",
+            value: "aboutme",
+            placeholder: "Write about yourself...",
+            multiline: true,
+          },
+          {
+            title: "Education",
+            value: "education",
+            placeholder: "Write your highest education..",
+          },
+          {
+            title: "Work",
+            value: "work",
+            placeholder: "Company of your work..",
+          },
+          {
+            title: "Height",
+            value: "height",
+            placeholder: "Enter your height (e.g., 5'7\")",
+          },
+          {
+            title: "Hobby",
+            value: "hobies",
+            placeholder: "Write your hobbies",
+          },
+        ].map((field, index) => (
+          <View key={index} style={styles.fieldContainer}>
+            <FormField
+              title={field.title}
+              value={form[field.value]}
+              placeholder={field.placeholder}
+              multiline={field.multiline || false}
+              otherStyles={field.multiline ? { height: 100 } : undefined}
+              handleChangeText={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  [field.value]: e,
+                }))
+              }
+            />
+          </View>
+        ))}
+
+        {/* Income Dropdown */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.title}>Income</Text>
+          <View style={styles.dropdownContainer}>
+            <Picker
+              selectedValue={form.income}
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, income: value }))
+              }
+              style={styles.picker}
+              dropdownIconColor="#808080"
+            >
+              <Picker.Item
+                label="Select income"
+                value=""
+                style={styles.placeholderLabel}
+              />
+              {incomeOptions.map((option) => (
+                <Picker.Item key={option} label={option} value={option} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        {/* Lives in Dropdown */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.title}>Current City</Text>
+          <View style={styles.dropdownContainer}>
+            <Picker
+              selectedValue={form.livesin}
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, livesin: value }))
+              }
+              style={styles.picker}
+              dropdownIconColor="#808080"
+            >
+              <Picker.Item
+                label="Select a district"
+                value=""
+                style={styles.placeholderLabel}
+              />
+              {districts.map((district) => (
+                <Picker.Item key={district} label={district} value={district} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        {/* Hometown Dropdown */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.title}>Hometown</Text>
+          <View style={styles.dropdownContainer}>
+            <Picker
+              selectedValue={form.hometown}
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, hometown: value }))
+              }
+              style={styles.picker}
+              dropdownIconColor="#808080"
+            >
+              <Picker.Item
+                label="Select a district"
+                value=""
+                style={styles.placeholderLabel}
+              />
+              {districts.map((district) => (
+                <Picker.Item key={district} label={district} value={district} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        {/* Marital Status Dropdown */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.title}>Marital Status</Text>
+          <View style={styles.dropdownContainer}>
+            <Picker
+              selectedValue={form.maritalStatus}
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, maritalStatus: value }))
+              }
+              style={styles.picker}
+              dropdownIconColor="#808080"
+            >
+              <Picker.Item
+                label="Select marital status"
+                value=""
+                style={styles.placeholderLabel}
+              />
+              {maritalStatuses.map((status) => (
+                <Picker.Item key={status} label={status} value={status} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        {/* Family Details */}
+        <View style={styles.fieldContainer}>
+          <FormField
+            title="Family Details"
+            value={form.familyDetails}
+            placeholder="Describe your family details (e.g. family members, family size, occupations, etc.)"
+            handleChangeText={(e) =>
+              setForm((prev) => ({ ...prev, familyDetails: e }))
+            }
+            otherStyles={{ height: 100 }}
+            multiline={true}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>Name:</Text>
-          <TextInput
-            value={name}
-            style={styles.inputBox}
-            onChangeText={(text) => setName(text)}
+
+        {/* Partner Expectations */}
+        <View style={styles.fieldContainer}>
+          <FormField
+            title="Partner Expectations"
+            value={form.partnerExpectations}
+            placeholder="Write about your expectations for your partner (e.g., qualities, profession, etc.)"
+            handleChangeText={(e) =>
+              setForm((prev) => ({ ...prev, partnerExpectations: e }))
+            }
+            otherStyles={{ height: 100 }}
+            multiline={true}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>Email:</Text>
-          <TextInput value={email} style={styles.inputBox} editable={false} />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>Password:</Text>
-          <TextInput
-            value={password}
-            style={styles.inputBox}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry={true}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>Role:</Text>
-          <TextInput
-            value={state?.user?.role}
-            style={styles.inputBox}
-            editable={false}
-          />
-        </View>
-        <View style={{ alignItems: "center", justifyContent: "flex-end" }}>
-          <TouchableOpacity onPress={handleUpdate} style={styles.updateBtn}>
-            <Text style={styles.updatedBtnText}>
-              {loading ? "Please wait" : "UPDATE"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+
+        <SubmitButton
+          btnTitle="Publish"
+          handlePress={saveBiodataToLocal}
+          // containerStyles={styles.submitButton}
+          // loading={loading}
+        />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#1E1E2C",
   },
-  inputContainer: {
-    marginTop: 20,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  inputTitle: {
-    fontWeight: "bold",
-    width: 70,
-    color: "#3C3C4E",
-  },
-  inputBox: {
-    width: 250,
-    backgroundColor: "#3C3C4E",
-    color: "#ffffff",
-    marginLeft: 10,
-    fontSize: 16,
-    paddingLeft: 15,
-    borderRadius: 5,
-  },
-  updateBtn: {
-    backgroundColor: "#3C3C4E",
-    color: "white",
-    padding: 20,
-    paddingHorizontal: 40,
-    borderRadius: 20,
-    marginTop: 30,
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  updatedBtnText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "bold",
+  scrollView: {
+    marginHorizontal: 16,
+    paddingVertical: 24,
   },
   header: {
-    alignItems: "center",
-    justifyContent: "flex-end",
+    marginBottom: 16,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: "medium",
+    color: "#FFFFFF",
+    textAlign: "left",
+  },
+  fieldContainer: {
+    marginBottom: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: "#333333",
+    borderRadius: 16,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginBottom: 8,
+  },
+  dropdownContainer: {
+    backgroundColor: "#2E2E40",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  picker: {
+    color: "#FFFFFF", // Label color for selected value
+    fontSize: 16,
+    height: 50,
+    width: "100%",
+  },
+  placeholderLabel: {
+    color: "#888888", // Light gray for the placeholder
+    fontSize: 14,
+  },
+  submitButton: {
+    marginTop: 24,
+    alignSelf: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    backgroundColor: "#FF8C42",
+    borderRadius: 30,
+    borderWidth: 2,
+    // borderColor: "#A6A6C1",
+  },
+  submitBtnText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textAlign: "center",
   },
 });
 

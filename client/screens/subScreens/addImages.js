@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Button,
@@ -10,11 +10,38 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MAX_IMAGES = 4;
 
 const AddImages = () => {
   const [images, setImages] = useState([]);
+  const saveImagesToLocal = async (images) => {
+    try {
+      await AsyncStorage.setItem("storedImages", JSON.stringify(images));
+      Alert.alert("Success", "Images saved to local storage!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to save images.");
+      console.error(error);
+    }
+  };
+
+  const loadImagesFromLocal = async () => {
+    try {
+      const storedImages = await AsyncStorage.getItem("storedImages");
+      if (storedImages) {
+        setImages(JSON.parse(storedImages));
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to load images.");
+      console.error(error);
+    }
+  };
+
+  //Load initial local stored images
+  useEffect(() => {
+    loadImagesFromLocal();
+  }, []);
 
   const openPicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -27,13 +54,18 @@ const AddImages = () => {
 
     if (!result.canceled) {
       const selectedImages = result.assets.map((asset) => asset.uri);
-      setImages((prev) => [...prev, ...selectedImages]);
+      const updatedImages = [...images, ...selectedImages];
+      setImages(updatedImages);
+      //store images to local
+      saveImagesToLocal(updatedImages);
     } else {
       Alert.alert("Cancelled", "No images were selected.");
     }
   };
-  const removeImage = (index) => {
+  const removeImage = async (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
+    //update images to local storages
+    saveImagesToLocal(images);
   };
 
   const uploadImages = async () => {
@@ -155,9 +187,9 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "red",
+    top: 4,
+    right: 4,
+    backgroundColor: "#FF6666",
     width: 24,
     height: 24,
     borderRadius: 12,

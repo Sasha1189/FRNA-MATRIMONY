@@ -2,30 +2,46 @@ import {
   View,
   Text,
   SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
   StyleSheet,
-  Alert,
+  ScrollView,
+  TouchableOpacity,
 } from "react-native";
-import React, { useContext } from "react";
-import { AuthContext } from "../../context/authContext";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import VideoCard from "../../components/SubComp/VideoCard";
 
-const Setting = () => {
-  const [state, setState] = useContext(AuthContext);
-  const navigation = useNavigation();
-  // logout
-  const handleLogout = async () => {
-    setState({ token: "", user: null });
-    await AsyncStorage.removeItem("@auth");
-    alert("logout successfully");
+const ProfileDisplay = () => {
+  const [images, setImages] = useState([]);
+  const loadImagesFromLocal = async () => {
+    try {
+      const storedImages = await AsyncStorage.getItem("storedImages");
+      if (storedImages) {
+        setImages(JSON.parse(storedImages));
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to load images.");
+      console.error(error);
+    }
   };
+  useEffect(() => {
+    loadImagesFromLocal();
+  }, []);
+  const data = [
+    {
+      id: "xyz1",
+      images: images,
+    },
+  ];
+  //   console.log(data[0]);
+  //   console.log(data.indexOf(data[0]));
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollView}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <VideoCard
+          item={data[0]}
+          //   index={data.indexOf(data[0])}
+        />
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment account</Text>
           <TouchableOpacity style={styles.button}>
@@ -47,27 +63,24 @@ const Setting = () => {
             <Text style={styles.buttonText}>Term of service</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.sectionDanger}>
-          <TouchableOpacity style={styles.button} onPress={handleLogout}>
-            <Text style={styles.buttonText}>Logout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Delete account</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: "#1E1E2C", // Replace with your primary color
+  container: {
     flex: 1,
+    backgroundColor: "#000",
   },
-  scrollView: {
-    paddingHorizontal: 16,
-    marginVertical: 24,
+  footer: {
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  listContainer: {
+    // paddingBottom: 20,
+    borderWidth: 1,
+    borderColor: "red",
   },
   section: {
     borderWidth: 2,
@@ -108,5 +121,4 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
 });
-
-export default Setting;
+export default ProfileDisplay;

@@ -36,48 +36,6 @@ const DATA = [
     ],
     caption: "City Lights",
   },
-  {
-    id: "4",
-    imageUri:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRimP40ZfDxfoFIhof-9Hwff8Ff0CMstHnhbA&s",
-    caption: "City Lights",
-  },
-  {
-    id: "5",
-    imageUri:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToA5egJYawjmoibG30ksrnHCEYc2sW6Ym1MQ&s",
-    caption: "City Lights",
-  },
-  {
-    id: "6",
-    imageUri:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCLmemnUWG3yO5Vqpp2eQSOu_3EK6DlDAoBw&s",
-    caption: "City Lights",
-  },
-  {
-    id: "7",
-    imageUri:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOkOKsKk_Mk9dqDR0Iqkr8tcmWlJorRwYatw&s",
-    caption: "City Lights",
-  },
-  {
-    id: "8",
-    imageUri:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrGnOzNsyvytROgL7iu9Je9YRuSEBAPkTDzQ&s",
-    caption: "City Lights",
-  },
-  {
-    id: "9",
-    imageUri:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsmW8qnrjPjrBAv5QkP2DJIU5Muy-LWQptnA&s",
-    caption: "City Lights",
-  },
-  {
-    id: "10",
-    imageUri:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMgn5ptL4lS38EOu7ooPOmUzSZmyEkmu89bg&s",
-    caption: "City Lights",
-  },
 ];
 
 const HomeScreen = () => {
@@ -89,6 +47,7 @@ const HomeScreen = () => {
       setCurrentIndex(newIndex);
     }
   }).current;
+  // console.log("from home scree", DATA.indexOf(item));
 
   return (
     <SafeAreaView style={styles.container}>
@@ -107,7 +66,7 @@ const HomeScreen = () => {
         }}
         ListEmptyComponent={() => (
           <EmptyList
-            title="No Videos Found"
+            title="No Video's Found"
             subtitle="Be the first one to upload a video"
           />
         )}

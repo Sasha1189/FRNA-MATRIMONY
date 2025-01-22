@@ -6,3 +6,23 @@ VirtualizedList: You have a large list that is slow to
     etc. {"contentLength": 6480, "dt": 814, "prevDt": 910}
 
 2.
+
+
+
+
+Goverment regulatory information about app:
+1. Matrimonial sites must verify users with valid IDs: Government
+2.“service providers should make a declaration that website is strictly for matrimonial
+ purpose only and not a dating website and should not be used for posting obscene material.”
+3.“user's intent to enter in to matrimonial alliance” and “confirm that the user information 
+is correct to the best his or her knowledge” when they register to join the platform.
+4.“Matrimonial websites are intermediary under section 2 of Information Technology Act 
+and they are mandated to follow IT Act,”
+5.“It is advisable that matrimonial websites should provide a list of legally verifiable 
+document which shall serve proof of identity,”
+6. Matrimonial websites under new rules will be required to name grievances redressal 
+officer on their portals. Besides, the new rule mandates “matrimonial websites should 
+store IP address of profile creator for one year from the date of activation,”it said.
+6.People who register will need to authenticate with true copies of identity and address 
+proofs. This is further aimed at checking the posting of obscene materials and guard the 
+websites from becoming dating platforms

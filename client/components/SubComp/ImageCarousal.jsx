@@ -11,65 +11,7 @@ import Pagination from "./Pagination";
 
 const { width, height } = Dimensions.get("window");
 
-const items = [
-  {
-    id: 1,
-    image: require("../../assets/images/1.jpg"),
-    title: "Title",
-  },
-  {
-    id: 2,
-    image: require("../../assets/images/2.jpg"),
-    title: "Title",
-  },
-  {
-    id: 3,
-    image: require("../../assets/images/3.jpg"),
-    title: "Title",
-  },
-  {
-    id: 4,
-    image: require("../../assets/images/4.jpg"),
-    title: "Title",
-  },
-  {
-    id: 5,
-    image: require("../../assets/images/5.jpg"),
-    title: "Title",
-  },
-  {
-    id: 6,
-    image: require("../../assets/images/user1.jpg"),
-    title: "Title",
-  },
-  {
-    id: 7,
-    image: require("../../assets/images/user2.jpg"),
-    title: "Title",
-  },
-  {
-    id: 8,
-    image: require("../../assets/images/user3.jpg"),
-    title: "Title",
-  },
-  {
-    id: 9,
-    image: require("../../assets/images/user4.jpg"),
-    title: "Title",
-  },
-  {
-    id: 10,
-    image: require("../../assets/images/user5.jpg"),
-    title: "Title",
-  },
-  {
-    id: 11,
-    image: require("../../assets/images/user6.jpg"),
-    title: "Title",
-  },
-];
-
-const ImageCarousal = () => {
+const ImageCarousal = (item) => {
   const scrollRef = React.useRef();
   const scrollAnimation = React.useRef(new Animated.Value(0)).current;
   return (
@@ -77,7 +19,7 @@ const ImageCarousal = () => {
       <StatusBar hidden />
       <Animated.FlatList
         ref={scrollRef}
-        data={items}
+        data={item.images}
         bounces={false}
         horizontal
         pagingEnabled
@@ -96,7 +38,7 @@ const ImageCarousal = () => {
           return (
             <View style={styles.item}>
               <Animated.Image
-                source={item.image}
+                source={{ uri: item }}
                 style={[
                   styles.image,
                   {
@@ -140,11 +82,11 @@ const ImageCarousal = () => {
           );
         }}
       />
-      <Pagination
-        items={items}
+      {/* <Pagination
+        items={item}
         scrollAnimation={scrollAnimation}
         scrollRef={scrollRef}
-      />
+      /> */}
     </View>
   );
 };

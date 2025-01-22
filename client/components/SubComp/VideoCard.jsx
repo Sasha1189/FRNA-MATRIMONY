@@ -19,12 +19,13 @@ const COLORS = {
 };
 
 const VideoCard = ({ item }) => {
+  // console.log("Item from videocard :=>", item.id);
+  // console.log("Item from videocard :=>", item.images);
+
   return (
     <View style={styles.cardContainer}>
       <View style={styles.videoCard}>
-        <ImageCarousal
-        // images={item.images}
-        />
+        <ImageCarousal id={item.id} images={item.images} />
       </View>
       <View style={styles.userContainer}>
         <Text style={styles.nav}>Ruchika 22</Text>

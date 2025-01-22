@@ -12,6 +12,7 @@ import Profile from "../../screens/Profile";
 import Biodata from "../../screens/subScreens/Biodata";
 import Setting from "../../screens/subScreens/Setting";
 import AddImages from "../../screens/subScreens/AddImages";
+import MyProfile from "../../screens/subScreens/MyProfile";
 
 const ScreenMenu = () => {
   // Access the global state
@@ -55,6 +56,13 @@ const ScreenMenu = () => {
           <Stack.Screen
             name="Profile"
             component={Profile}
+            options={{
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="MyProfile"
+            component={MyProfile}
             options={{
               headerShown: true,
             }}
