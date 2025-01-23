@@ -37,7 +37,6 @@ const AddImages = () => {
       console.error(error);
     }
   };
-
   //Load initial local stored images
   useEffect(() => {
     loadImagesFromLocal();

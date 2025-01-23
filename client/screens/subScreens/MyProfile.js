@@ -1,6 +1,7 @@
 import { SafeAreaView, StyleSheet } from "react-native";
 import React from "react";
 import ProfileDisplay from "../../components/SubComp/ProfileDisplay";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MyProfile = () => {
   return (

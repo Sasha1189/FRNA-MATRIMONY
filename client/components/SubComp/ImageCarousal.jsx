@@ -24,7 +24,7 @@ const ImageCarousal = (item) => {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => index.toString()}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollAnimation } } }],
           { useNativeDriver: true }

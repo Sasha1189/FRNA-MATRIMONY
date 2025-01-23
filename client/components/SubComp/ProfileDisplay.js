@@ -12,6 +12,7 @@ import VideoCard from "../../components/SubComp/VideoCard";
 
 const ProfileDisplay = () => {
   const [images, setImages] = useState([]);
+  const [Biodata, setBiodata] = useState({});
   const loadImagesFromLocal = async () => {
     try {
       const storedImages = await AsyncStorage.getItem("storedImages");
@@ -23,8 +24,20 @@ const ProfileDisplay = () => {
       console.error(error);
     }
   };
+  const loadBiodataFromLocal = async () => {
+    try {
+      const storedBiodata = await AsyncStorage.getItem("storedBiodata");
+      if (storedBiodata) {
+        setBiodata(JSON.parse(storedBiodata));
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to load images.");
+      console.error(error);
+    }
+  };
   useEffect(() => {
     loadImagesFromLocal();
+    loadBiodataFromLocal();
   }, []);
   const data = [
     {
@@ -32,23 +45,50 @@ const ProfileDisplay = () => {
       images: images,
     },
   ];
-  //   console.log(data[0]);
-  //   console.log(data.indexOf(data[0]));
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <VideoCard
-          item={data[0]}
-          //   index={data.indexOf(data[0])}
-        />
+      <ScrollView style={styles.scrollViewContainer}>
+        <VideoCard item={data[0]} />
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Payment account</Text>
+          <Text style={styles.sectionTitle}>About me</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Manage pay account</Text>
+            <Text style={styles.buttonText}>{Biodata.aboutme}</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Work</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>{Biodata.work}</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Current City</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>{Biodata.livesin}</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Hometown</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>{Biodata.hometown}</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Income</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>{Biodata.income}</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Height</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>{Biodata.height}</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Hobby</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>{Biodata.hobies}</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>family Details</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>{Biodata.familyDetails}</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Partner Expectatios</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>{Biodata.partnerExpectations}</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Contact us</Text>
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>Help & Support</Text>
@@ -62,7 +102,7 @@ const ProfileDisplay = () => {
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>Term of service</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -73,12 +113,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#000",
   },
-  footer: {
-    alignItems: "center",
-    justifyContent: "flex-end",
+  scrollViewContainer: {
+    marginBottom: 50,
   },
   listContainer: {
-    // paddingBottom: 20,
     borderWidth: 1,
     borderColor: "red",
   },

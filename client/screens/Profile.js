@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,28 @@ import {
 import { images, icons } from "../constants";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Footer from "../components/Menus/Footer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Profile = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const [images, setImages] = useState([]);
+
+  const loadImagesFromLocal = async () => {
+    try {
+      const storedImages = await AsyncStorage.getItem("storedImages");
+      if (storedImages) {
+        setImages(JSON.parse(storedImages));
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to load images.");
+      console.error(error);
+    }
+  };
+  //Load initial local stored images
+  useEffect(() => {
+    loadImagesFromLocal();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mainContent}>
@@ -23,11 +41,19 @@ const Profile = () => {
           style={styles.profileSection}
         >
           <View style={styles.profileImageContainer}>
-            <Image
-              source={require("../assets/images/profile.png")}
-              style={styles.profileImage}
-              resizeMode="contain"
-            />
+            {images.length > 0 ? (
+              <Image
+                source={{ uri: images[0] }}
+                style={styles.profileImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <Image
+                source={require("../assets/images/profile.png")}
+                style={styles.profileImage}
+                resizeMode="contain"
+              />
+            )}
           </View>
           <Text style={styles.profileName}>Swaraj, 24</Text>
         </TouchableOpacity>
@@ -178,8 +204,8 @@ const styles = StyleSheet.create({
     // borderColor: "red",
   },
   subscribeButton: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 100,
     backgroundColor: "#FF8C42",
     borderRadius: 30,
     borderWidth: 2,
