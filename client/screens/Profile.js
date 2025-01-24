@@ -127,12 +127,9 @@ const styles = StyleSheet.create({
     // flex: 1, // Ensures main content takes all available space above the footer
   },
   profileSection: {
-    // flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 20,
-    // borderWidth: 1,
-    // borderColor: "red",
   },
   profileImageContainer: {
     width: 150,
@@ -157,12 +154,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttonsSection: {
-    // flex: 1,
     justifyContent: "space-evenly",
     alignItems: "center",
     paddingHorizontal: 5,
-    // borderWidth: 1,
-    // borderColor: "red",
   },
   buttonWrapper: {
     alignItems: "center",
@@ -200,8 +194,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
-    // borderWidth: 1,
-    // borderColor: "red",
   },
   subscribeButton: {
     paddingVertical: 12,
@@ -209,7 +201,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF8C42",
     borderRadius: 30,
     borderWidth: 2,
-    // borderColor: "#A6A6C1",
   },
   subscribeText: {
     fontSize: 18,
@@ -220,8 +211,6 @@ const styles = StyleSheet.create({
   footerSection: {
     alignItems: "center",
     justifyContent: "flex-end",
-    // borderWidth: 1,
-    // borderColor: "red",
   },
 });
 

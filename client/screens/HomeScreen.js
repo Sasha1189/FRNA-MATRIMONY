@@ -16,7 +16,20 @@ const DATA = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsmW8qnrjPjrBAv5QkP2DJIU5Muy-LWQptnA&s",
     ],
 
-    caption: "Beautiful Sunset",
+    biodata: {
+      aboutme: "Open minded free",
+      education: "BCOM",
+      familyDetails: "Father mother staying together ",
+      fullname: "Pranav",
+      height: "5'6 ",
+      hobies: "Wrestaling",
+      hometown: "Satara",
+      income: "Less than 10 Lakh",
+      livesin: "Pune",
+      maritalStatus: "Single",
+      partnerExpectations: "Well earning",
+      work: "TCS",
+    },
   },
   {
     id: "2",
@@ -25,7 +38,20 @@ const DATA = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrGnOzNsyvytROgL7iu9Je9YRuSEBAPkTDzQ&s",
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOkOKsKk_Mk9dqDR0Iqkr8tcmWlJorRwYatw&s",
     ],
-    caption: "Mountain Adventure",
+    biodata: {
+      aboutme: "Caring, Loving, Social ",
+      education: "Science",
+      familyDetails: "Grand Parents, Father, mother, Brother, Sister",
+      fullname: "Mohan",
+      height: "7'",
+      hobies: "Tennis",
+      hometown: "Solapur",
+      income: "Less than 10 Lakh",
+      livesin: "Mumbai",
+      maritalStatus: "Single",
+      partnerExpectations: "Smart Ambitious Social",
+      work: "Reliance",
+    },
   },
   {
     id: "3",
@@ -34,7 +60,20 @@ const DATA = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToA5egJYawjmoibG30ksrnHCEYc2sW6Ym1MQ&s",
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRimP40ZfDxfoFIhof-9Hwff8Ff0CMstHnhbA&s",
     ],
-    caption: "City Lights",
+    biodata: {
+      aboutme: "Health man who has been working Caring ",
+      education: "BA",
+      familyDetails: "Father mother brother ",
+      fullname: "Swaraj ",
+      height: "6'",
+      hobies: "Football ",
+      hometown: "Buldhana",
+      income: "Less than 10 Lakh",
+      livesin: "Chandrapur",
+      maritalStatus: "Single",
+      partnerExpectations: "Well groomed mannered ",
+      work: "Accenture ",
+    },
   },
 ];
 
@@ -47,7 +86,6 @@ const HomeScreen = () => {
       setCurrentIndex(newIndex);
     }
   }).current;
-  // console.log("from home scree", DATA.indexOf(item));
 
   return (
     <SafeAreaView style={styles.container}>

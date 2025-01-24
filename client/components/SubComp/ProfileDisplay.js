@@ -1,55 +1,20 @@
 import {
   View,
   Text,
-  SafeAreaView,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import VideoCard from "../../components/SubComp/VideoCard";
 
-const ProfileDisplay = () => {
-  const [images, setImages] = useState([]);
-  const [Biodata, setBiodata] = useState({});
-  const loadImagesFromLocal = async () => {
-    try {
-      const storedImages = await AsyncStorage.getItem("storedImages");
-      if (storedImages) {
-        setImages(JSON.parse(storedImages));
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to load images.");
-      console.error(error);
-    }
-  };
-  const loadBiodataFromLocal = async () => {
-    try {
-      const storedBiodata = await AsyncStorage.getItem("storedBiodata");
-      if (storedBiodata) {
-        setBiodata(JSON.parse(storedBiodata));
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to load images.");
-      console.error(error);
-    }
-  };
-  useEffect(() => {
-    loadImagesFromLocal();
-    loadBiodataFromLocal();
-  }, []);
-  const data = [
-    {
-      id: "xyz1",
-      images: images,
-    },
-  ];
-
+const ProfileDisplay = ({ user }) => {
+  const Biodata = user.biodata;
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollViewContainer}>
-        <VideoCard item={data[0]} />
+        <VideoCard item={user} />
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About me</Text>
           <TouchableOpacity style={styles.button}>
@@ -88,21 +53,6 @@ const ProfileDisplay = () => {
             <Text style={styles.buttonText}>{Biodata.partnerExpectations}</Text>
           </TouchableOpacity>
         </View>
-        {/* <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Contact us</Text>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Help & Support</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Legal</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Privacy policy</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Term of service</Text>
-          </TouchableOpacity>
-        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -114,7 +64,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
   },
   scrollViewContainer: {
-    marginBottom: 50,
+    // paddingBottom: 5,
   },
   listContainer: {
     borderWidth: 1,
@@ -123,6 +73,7 @@ const styles = StyleSheet.create({
   section: {
     borderWidth: 2,
     borderColor: "#333333",
+    marginTop: 16,
     marginBottom: 16,
     padding: 16,
     paddingBottom: 0,

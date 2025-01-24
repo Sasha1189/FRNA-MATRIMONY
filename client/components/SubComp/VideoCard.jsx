@@ -6,8 +6,10 @@ import {
   Dimensions,
   StyleSheet,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import IconButton from "./IconButton";
 import ImageCarousal from "./ImageCarousal";
+import DynymicUserProfile from "../../screens/subScreens/DynymicUserProfile";
 
 const { width, height } = Dimensions.get("window");
 const ITEMSIZE = width * 0.95;
@@ -19,9 +21,10 @@ const COLORS = {
 };
 
 const VideoCard = ({ item }) => {
-  // console.log("Item from videocard :=>", item.id);
-  // console.log("Item from videocard :=>", item.images);
-
+  const navigation = useNavigation();
+  const handlePress = () => {
+    navigation.navigate("DynymicUserProfile", { user: item });
+  };
   return (
     <View style={styles.cardContainer}>
       <View style={styles.videoCard}>
@@ -35,7 +38,12 @@ const VideoCard = ({ item }) => {
       <View style={styles.iconContainer}>
         <IconButton name="thumbs-up" size={24} color={COLORS.nope} />
         <IconButton name="commenting-o" size={24} color={COLORS.star} />
-        <IconButton name="info" size={24} color={COLORS.like} />
+        <IconButton
+          name="info"
+          size={24}
+          color={COLORS.like}
+          handlePress={handlePress}
+        />
       </View>
     </View>
   );

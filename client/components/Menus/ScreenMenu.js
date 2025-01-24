@@ -13,6 +13,7 @@ import Biodata from "../../screens/subScreens/Biodata";
 import Setting from "../../screens/subScreens/Setting";
 import AddImages from "../../screens/subScreens/AddImages";
 import MyProfile from "../../screens/subScreens/MyProfile";
+import DynymicUserProfile from "../../screens/subScreens/DynymicUserProfile";
 
 const ScreenMenu = () => {
   // Access the global state
@@ -27,6 +28,13 @@ const ScreenMenu = () => {
           <Stack.Screen
             name="HomeScreen"
             component={HomeScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="DynymicUserProfile"
+            component={DynymicUserProfile}
             options={{
               headerShown: false,
             }}
