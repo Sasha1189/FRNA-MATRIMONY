@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  SafeAreaView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
-import { images, icons } from "../constants";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Footer from "../components/Menus/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -84,7 +77,7 @@ const Profile = () => {
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.buttonText}>Add Biodata</Text>
+              <Text style={styles.buttonText}>Update biodata</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate("Setting")}
@@ -104,12 +97,14 @@ const Profile = () => {
 
         {/* Subscribe Section */}
         <View style={styles.subscribeSection}>
-          <TouchableOpacity style={styles.subscribeButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Chat")}
+            style={styles.subscribeButton}
+          >
             <Text style={styles.subscribeText}>Subscribe</Text>
           </TouchableOpacity>
         </View>
       </View>
-
       {/* Footer Section */}
       <View style={styles.footerSection}>
         <Footer />
@@ -124,7 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E1E2C", // Dark background for a modern look
   },
   mainContent: {
-    // flex: 1, // Ensures main content takes all available space above the footer
+    flex: 1, // Ensures main content takes all available space above the footer
   },
   profileSection: {
     justifyContent: "center",
@@ -190,8 +185,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   subscribeSection: {
-    margin: 20,
-    justifyContent: "center",
+    flex: 1,
+    marginBottom: 20,
+    justifyContent: "flex-end",
     alignItems: "center",
     paddingHorizontal: 20,
   },

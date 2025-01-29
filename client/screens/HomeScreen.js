@@ -89,26 +89,28 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={DATA}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <VideoCard item={item} />}
-        contentContainerStyle={styles.listContainer}
-        pagingEnabled
-        snapToAlignment="center"
-        decelerationRate="fast"
-        showsVerticalScrollIndicator={false}
-        onViewableItemsChanged={handleViewableItemsChanged}
-        viewabilityConfig={{
-          itemVisiblePercentThreshold: 80, // Image considered "active" when 80% visible
-        }}
-        ListEmptyComponent={() => (
-          <EmptyList
-            title="No Video's Found"
-            subtitle="Be the first one to upload a video"
-          />
-        )}
-      />
+      <View style={styles.flatListContainer}>
+        <FlatList
+          data={DATA}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <VideoCard item={item} />}
+          contentContainerStyle={styles.listContainer}
+          pagingEnabled
+          snapToAlignment="center"
+          decelerationRate="fast"
+          showsVerticalScrollIndicator={false}
+          onViewableItemsChanged={handleViewableItemsChanged}
+          viewabilityConfig={{
+            itemVisiblePercentThreshold: 80, // Image considered "active" when 80% visible
+          }}
+          ListEmptyComponent={() => (
+            <EmptyList
+              title="No Video's Found"
+              subtitle="Be the first one to upload a video"
+            />
+          )}
+        />
+      </View>
       <View style={styles.footer}>
         <Footer />
       </View>
@@ -119,16 +121,20 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#FFFFFF",
   },
   footer: {
     alignItems: "center",
     justifyContent: "flex-end",
+    // marginTop: 10,
   },
-  listContainer: {
-    // paddingBottom: 20,
-    borderWidth: 1,
-    borderColor: "red",
+  flatListContainer: {
+    flex: 1,
+    // borderWidth: 1,
+    // borderColor: "red",
+    borderRadius: 10,
+    margin: 5,
+    overflow: "hidden",
   },
 });
 

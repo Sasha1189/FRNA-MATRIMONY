@@ -4,9 +4,6 @@ import Home from "../../screens/Home";
 import Register from "../../screens/auth/Register";
 import Login from "../../screens/auth/Login";
 import { AuthContext } from "../../context/authContext";
-import Post from "../../screens/Post";
-import Myposts from "../../screens/Myposts";
-import Account from "../../screens/Account";
 import HomeScreen from "../../screens/HomeScreen";
 import Profile from "../../screens/Profile";
 import Biodata from "../../screens/subScreens/Biodata";
@@ -14,6 +11,7 @@ import Setting from "../../screens/subScreens/Setting";
 import AddImages from "../../screens/subScreens/AddImages";
 import MyProfile from "../../screens/subScreens/MyProfile";
 import DynymicUserProfile from "../../screens/subScreens/DynymicUserProfile";
+import FiltersScreen from "../../screens/FiltersScreen";
 
 const ScreenMenu = () => {
   // Access the global state
@@ -29,14 +27,14 @@ const ScreenMenu = () => {
             name="HomeScreen"
             component={HomeScreen}
             options={{
-              headerShown: false,
+              headerShown: true,
             }}
           />
           <Stack.Screen
             name="DynymicUserProfile"
             component={DynymicUserProfile}
             options={{
-              headerShown: false,
+              headerShown: true,
             }}
           />
           <Stack.Screen
@@ -47,20 +45,6 @@ const ScreenMenu = () => {
             }}
           />
 
-          <Stack.Screen
-            name="Myposts"
-            component={Myposts}
-            options={{
-              headerShown: true,
-            }}
-          />
-          <Stack.Screen
-            name="Account"
-            component={Account}
-            options={{
-              headerShown: true,
-            }}
-          />
           <Stack.Screen
             name="Profile"
             component={Profile}
@@ -95,6 +79,15 @@ const ScreenMenu = () => {
             options={{
               headerShown: true,
             }}
+          />
+          <Stack.Screen
+            name="FiltersScreen"
+            component={FiltersScreen}
+            options={
+              {
+                // headerShown: true,
+              }
+            }
           />
         </>
       ) : (

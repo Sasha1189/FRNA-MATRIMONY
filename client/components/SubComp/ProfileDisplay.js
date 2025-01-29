@@ -2,20 +2,26 @@ import {
   View,
   Text,
   StyleSheet,
+  Dimensions,
+  Platform,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import VideoCard from "../../components/SubComp/VideoCard";
+import ImageCarousal from "./ImageCarousal";
 
 const ProfileDisplay = ({ user }) => {
+  const { height, width } = Dimensions.get("window");
+  const containerHeight = height * 0.8;
   const Biodata = user.biodata;
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollViewContainer}>
-        <VideoCard item={user} />
-        <View style={styles.section}>
+        <View style={[styles.sectionImage, { height: containerHeight }]}>
+          <ImageCarousal id={user.id} images={user.images} />
+        </View>
+        <View style={styles.sectionBiodata}>
           <Text style={styles.sectionTitle}>About me</Text>
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>{Biodata.aboutme}</Text>
@@ -63,14 +69,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#000",
   },
-  scrollViewContainer: {
-    // paddingBottom: 5,
-  },
   listContainer: {
     borderWidth: 1,
     borderColor: "red",
   },
-  section: {
+  sectionImage: {
+    flex: 1,
+    // height: containerHeight,
+    borderRadius: 10,
+    margin: 5,
+    overflow: "hidden",
+  },
+  sectionBiodata: {
     borderWidth: 2,
     borderColor: "#333333",
     marginTop: 16,

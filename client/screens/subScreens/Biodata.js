@@ -57,6 +57,10 @@ const maritalStatuses = ["Single", "Divorced", "Widowed"];
 const incomeOptions = ["Less than 10 Lakh", "More than 10 Lakh"];
 
 const Biodata = () => {
+  //Global State variables
+  // const [state, setState] = useContext(AuthContext);
+  // const { user, token } = state;
+  // Local State variables
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     fullname: "",
@@ -116,37 +120,22 @@ const Biodata = () => {
   };
 
   const submit = async () => {
-    const isEmptyField = Object.values(form).some((value) => !value);
-    if (isEmptyField) {
-      return Alert.alert("Error", "Please fill out all fields.");
-    }
-
+    if (!validateForm()) return;
+    setLoading(true);
+    console.log(form);
     try {
-      // Example API call
-      await createVideoPost({
+      setLoading(true);
+      const { data } = await axios.put("/auth/update-user", {
         ...form,
-        // userId: user.$id, // Assuming user context is available
       });
-
-      Alert.alert("Success", "Profile updated successfully!");
-      // router.push("/home");
+      setLoading(false);
+      let updatedData = JSON.stringify(data);
+      setForm(updatedData);
+      alert("Biodata updated sucessfully", data.message);
     } catch (error) {
-      Alert.alert("Error", error.message);
-    } finally {
-      setForm({
-        fullname: "",
-        work: "",
-        education: "",
-        livesin: "",
-        hometown: "",
-        aboutme: "",
-        hobies: "",
-        height: "",
-        maritalStatus: "",
-        income: "",
-        familyDetails: "",
-        partnerExpectations: "",
-      });
+      alert(error.responce.data.message);
+      setLoading(false);
+      console.log(error);
     }
   };
 
@@ -347,7 +336,7 @@ const Biodata = () => {
             disabled={loading}
           >
             <Text style={styles.publishBtnText}>
-              {loading ? "Saving..." : "Publish"}
+              {loading ? "Updating..." : "UPDATE"}
             </Text>
           </TouchableOpacity>
         </ScrollView>
