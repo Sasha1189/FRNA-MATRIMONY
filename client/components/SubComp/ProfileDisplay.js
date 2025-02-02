@@ -11,52 +11,79 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ImageCarousal from "./ImageCarousal";
 
-const ProfileDisplay = ({ user }) => {
+const ProfileDisplay = ({ item }) => {
   const { height, width } = Dimensions.get("window");
-  const containerHeight = height * 0.8;
-  const Biodata = user.biodata;
+  const containerHeight = height * 0.8; // Ensure user is defined before using it
+  if (!item) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={{ color: "white", textAlign: "center" }}>
+          Loading Profile...
+        </Text>
+      </SafeAreaView>
+    );
+  }
+  const Biodata = item?.profile;
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollViewContainer}>
         <View style={[styles.sectionImage, { height: containerHeight }]}>
-          <ImageCarousal id={user.id} images={user.images} />
+          <ImageCarousal id={item._id} images={item?.image} />
         </View>
         <View style={styles.sectionBiodata}>
           <Text style={styles.sectionTitle}>About me</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.aboutme}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.aboutme || "Not Updated"}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Work</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.work}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.work || "Not Updated"}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Current City</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.livesin}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.livesin || "Not Updated"}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Hometown</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.hometown}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.hometown || "Not Updated"}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Income</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.income}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.income || "Not Updated"}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Height</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.height}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.height || "Not Updated"}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Hobby</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.hobies}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.hobies?.[0] || "Not Updated"}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>family Details</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.familyDetails}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.familyDetails || "Not Updated"}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Partner Expectatios</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>{Biodata.partnerExpectations}</Text>
+            <Text style={styles.buttonText}>
+              {Biodata.partnerExpectations || "Not Updated"}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

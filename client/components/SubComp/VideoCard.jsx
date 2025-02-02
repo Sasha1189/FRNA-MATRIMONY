@@ -23,17 +23,23 @@ const COLORS = {
 const VideoCard = ({ item }) => {
   const navigation = useNavigation();
   const handlePress = () => {
-    navigation.navigate("DynymicUserProfile", { user: item });
+    navigation.navigate("DynymicUserProfile", { item: item });
   };
   return (
     <View style={styles.cardContainer}>
       <View style={styles.videoCard}>
-        <ImageCarousal id={item.id} images={item.images} />
+        <ImageCarousal id={item._id} images={item?.image} />
       </View>
       <View style={styles.userContainer}>
-        <Text style={styles.nav}>Ruchika 22</Text>
-        <Text style={styles.location}>Accenture</Text>
-        <Text style={styles.distance}>Pune</Text>
+        <Text style={styles.nav}>
+          {item?.profile?.fullname || "Not Provided"}
+        </Text>
+        <Text style={styles.location}>
+          {item?.profile?.work || "Not Provided"}
+        </Text>
+        <Text style={styles.distance}>
+          {item?.profile?.livesin || "Not Provided"}
+        </Text>
       </View>
       <View style={styles.iconContainer}>
         <IconButton name="thumbs-up" size={24} color={COLORS.nope} />

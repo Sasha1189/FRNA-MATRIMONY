@@ -11,7 +11,7 @@ import Pagination from "./Pagination";
 
 const { width, height } = Dimensions.get("window");
 
-const ImageCarousal = (item) => {
+const ImageCarousal = ({ images }) => {
   const scrollRef = React.useRef();
   const scrollAnimation = React.useRef(new Animated.Value(0)).current;
   return (
@@ -19,12 +19,12 @@ const ImageCarousal = (item) => {
       <StatusBar hidden />
       <Animated.FlatList
         ref={scrollRef}
-        data={item.images}
+        data={images?.imageUrls}
         bounces={false}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(imageUrls, index) => index.toString()}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollAnimation } } }],
           { useNativeDriver: true }
@@ -39,6 +39,7 @@ const ImageCarousal = (item) => {
             <View style={styles.item}>
               <Animated.Image
                 source={{ uri: item }}
+                resizeMode={"cover"}
                 style={[
                   styles.image,
                   {

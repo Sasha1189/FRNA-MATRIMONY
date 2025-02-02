@@ -22,7 +22,7 @@ const PostProvider = ({ children }) => {
   };
   // Initial posts loading
   useEffect(() => {
-    getAllPosts();
+    // getAllPosts();
   }, []);
 
   return (

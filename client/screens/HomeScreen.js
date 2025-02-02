@@ -1,9 +1,24 @@
-import { View, FlatList, StyleSheet, Dimensions } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import React, {
+  useEffect,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import VideoCard from "../components/SubComp/VideoCard";
 import EmptyList from "../components/SubComp/EmptyList";
 import Footer from "../components/Menus/Footer";
+import axios from "axios";
+import { AuthContext } from "../context/authContext";
 
 const { height, width } = Dimensions.get("window");
 
@@ -78,7 +93,28 @@ const DATA = [
 ];
 
 const HomeScreen = () => {
+  const { state } = useContext(AuthContext);
+  const [profiles, setProfiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const fetchProfiles = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.234.147:8080/api/v1/auth/profiles"
+      );
+      setProfiles(response.data.profiles || []); // Ensure profiles is always an array
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [state?.token]);
+
+  useEffect(() => {
+    fetchProfiles();
+  }, [fetchProfiles]);
 
   const handleViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -91,8 +127,8 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.flatListContainer}>
         <FlatList
-          data={DATA}
-          keyExtractor={(item) => item.id}
+          data={profiles}
+          keyExtractor={(item) => item._id}
           renderItem={({ item }) => <VideoCard item={item} />}
           contentContainerStyle={styles.listContainer}
           pagingEnabled
@@ -103,12 +139,7 @@ const HomeScreen = () => {
           viewabilityConfig={{
             itemVisiblePercentThreshold: 80, // Image considered "active" when 80% visible
           }}
-          ListEmptyComponent={() => (
-            <EmptyList
-              title="No Video's Found"
-              subtitle="Be the first one to upload a video"
-            />
-          )}
+          ListEmptyComponent={() => <EmptyList title="No Profiles Found" />}
         />
       </View>
       <View style={styles.footer}>
@@ -126,12 +157,9 @@ const styles = StyleSheet.create({
   footer: {
     alignItems: "center",
     justifyContent: "flex-end",
-    // marginTop: 10,
   },
   flatListContainer: {
     flex: 1,
-    // borderWidth: 1,
-    // borderColor: "red",
     borderRadius: 10,
     margin: 5,
     overflow: "hidden",

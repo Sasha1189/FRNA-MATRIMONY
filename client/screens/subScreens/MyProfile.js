@@ -42,14 +42,10 @@ const MyProfile = () => {
     loadImagesFromLocal();
     loadBiodataFromLocal();
   }, []);
-  const user = {
-    id: "xyz1",
-    images: images,
-    biodata: Biodata,
-  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <ProfileDisplay user={user} />
+      <ProfileDisplay item={item} />
     </SafeAreaView>
   );
 };

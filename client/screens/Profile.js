@@ -36,7 +36,9 @@ const Profile = () => {
           <View style={styles.profileImageContainer}>
             {images.length > 0 ? (
               <Image
-                source={{ uri: images[0] }}
+                source={{
+                  uri: "https:i.pinimg.com/474x/88/35/a0/8835a06d5e2809efd686bbc6c40f38aa.jpg",
+                }}
                 style={styles.profileImage}
                 resizeMode="cover"
               />

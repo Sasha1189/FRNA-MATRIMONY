@@ -1,13 +1,17 @@
 import { View, Text, StyleSheet, Alert } from "react-native";
 import React, { useState } from "react";
+import { Picker } from "@react-native-picker/picker";
 import InputBox from "../../components/Forms/InputBox";
 import SubmitButton from "../../components/Forms/SubmitButton";
 import axios from "axios";
+
+const genders = ["Male", "Female"];
 
 const Register = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [gender, setGender] = useState("");
   const [loading, setLoading] = useState(false);
 
   //function
@@ -15,21 +19,25 @@ const Register = ({ navigation }) => {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      if (!name || !email || !password) {
+      if (!name || !email || !password || !gender) {
         Alert.alert("Please fill all fields");
         setLoading(false);
         return;
       }
       setLoading(false);
       //send data to server
-      const { data } = await axios.post("/auth/register", {
-        name,
-        email,
-        password,
-      });
+      const { data } = await axios.post(
+        "http://192.168.66.147:8080/api/v1/auth/register",
+        {
+          name,
+          email,
+          password,
+          gender,
+        }
+      );
       alert(data && data.message);
       navigation.navigate("Login");
-      console.log("Registration data", { name, email, password });
+      console.log("Registration data", { name, email, password, gender });
     } catch (error) {
       alert(error.response.data.message);
       setLoading(fasle);
@@ -38,7 +46,7 @@ const Register = ({ navigation }) => {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.pageTitle}>Register</Text>
+      <Text style={styles.pageTitle}>Register to our lonari community</Text>
       <View style={{ marginHorizontal: 20 }}>
         <InputBox inputTitle={"Name"} value={name} setValue={setName} />
         <InputBox
@@ -55,6 +63,24 @@ const Register = ({ navigation }) => {
           value={password}
           setValue={setPassword}
         />
+        <Text style={styles.genderTitle}>Gender</Text>
+        <View style={styles.dropdownContainer}>
+          <Picker
+            selectedValue={gender}
+            onValueChange={(value) => setGender(value)}
+            style={styles.picker}
+            dropdownIconColor="#808080"
+          >
+            <Picker.Item
+              label="Select marital status"
+              value=""
+              style={styles.placeholderLabel}
+            />
+            {genders.map((status) => (
+              <Picker.Item key={status} label={status} value={status} />
+            ))}
+          </Picker>
+        </View>
       </View>
       <SubmitButton
         btnTitle={"Register"}
@@ -83,19 +109,38 @@ const styles = StyleSheet.create({
     backgroundColor: "#e1d5c9",
   },
   pageTitle: {
-    fontSize: 40,
+    fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
   },
   inputBox: {
-    height: 40,
+    height: 50,
     marginBottom: 20,
     backgroundColor: "#ffffff",
     borderRadius: 10,
     marginTop: 10,
     paddingLeft: 10,
     color: "#af9f85",
+  },
+  genderTitle: {
+    marginBottom: 10,
+  },
+  dropdownContainer: {
+    marginBottom: 20,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  picker: {
+    color: "#010101", // Label color for selected value
+    fontSize: 14,
+    height: 50,
+    width: "100%",
+  },
+  placeholderLabel: {
+    color: "#888888", // Light gray for the placeholder
+    fontSize: 14,
   },
   linkText: {
     textAlign: "center",

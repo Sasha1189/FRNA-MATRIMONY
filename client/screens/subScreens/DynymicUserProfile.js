@@ -4,10 +4,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProfileDisplay from "../../components/SubComp/ProfileDisplay";
 
 const DynymicUserProfile = ({ route }) => {
-  const { user } = route.params;
+  const { item } = route.params;
   return (
     <SafeAreaView style={styles.container}>
-      <ProfileDisplay user={user} />
+      <ProfileDisplay item={item} />
     </SafeAreaView>
   );
 };
