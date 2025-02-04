@@ -26,15 +26,12 @@ const Register = ({ navigation }) => {
       }
       setLoading(false);
       //send data to server
-      const { data } = await axios.post(
-        "http://192.168.66.147:8080/api/v1/auth/register",
-        {
-          name,
-          email,
-          password,
-          gender,
-        }
-      );
+      const { data } = await axios.post("/auth/register", {
+        name,
+        email,
+        password,
+        gender,
+      });
       alert(data && data.message);
       navigation.navigate("Login");
       console.log("Registration data", { name, email, password, gender });
@@ -72,7 +69,7 @@ const Register = ({ navigation }) => {
             dropdownIconColor="#808080"
           >
             <Picker.Item
-              label="Select marital status"
+              label="Select gender"
               value=""
               style={styles.placeholderLabel}
             />

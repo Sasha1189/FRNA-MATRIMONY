@@ -26,10 +26,7 @@ const Login = ({ navigation }) => {
       }
       setLoading(false);
       //send data to server
-      const { data } = await axios.post(
-        "http://192.168.66.147:8080/api/v1/auth/login",
-        { email, password }
-      );
+      const { data } = await axios.post("/auth/login", { email, password });
       //set data to global state
       setState(data);
       //store data to local

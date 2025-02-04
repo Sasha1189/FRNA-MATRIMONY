@@ -1,28 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Footer from "../components/Menus/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../context/authContext";
 
 const Profile = () => {
+  const [state] = useContext(AuthContext);
   const navigation = useNavigation();
   const route = useRoute();
   const [images, setImages] = useState([]);
 
-  const loadImagesFromLocal = async () => {
-    try {
-      const storedImages = await AsyncStorage.getItem("storedImages");
-      if (storedImages) {
-        setImages(JSON.parse(storedImages));
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to load images.");
-      console.error(error);
-    }
-  };
   //Load initial local stored images
   useEffect(() => {
+    const loadImagesFromLocal = async () => {
+      try {
+        const storedImages = await AsyncStorage.getItem("storedImages");
+        if (storedImages) {
+          setImages(JSON.parse(storedImages));
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to load images.");
+        console.error(error);
+      }
+    };
     loadImagesFromLocal();
   }, []);
   return (
@@ -37,7 +39,7 @@ const Profile = () => {
             {images.length > 0 ? (
               <Image
                 source={{
-                  uri: "https:i.pinimg.com/474x/88/35/a0/8835a06d5e2809efd686bbc6c40f38aa.jpg",
+                  uri: images[0],
                 }}
                 style={styles.profileImage}
                 resizeMode="cover"
@@ -50,7 +52,11 @@ const Profile = () => {
               />
             )}
           </View>
-          <Text style={styles.profileName}>Swaraj, 24</Text>
+          <Text style={styles.profileName}>
+            {state?.user?.name
+              ?.toLowerCase()
+              .replace(/\b\w/g, (char) => char.toUpperCase())}
+          </Text>
         </TouchableOpacity>
         {/* Buttons Section */}
         <View style={styles.buttonsSection}>

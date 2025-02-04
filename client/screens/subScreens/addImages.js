@@ -11,37 +11,53 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const MAX_IMAGES = 4;
 
 const AddImages = () => {
   const [images, setImages] = useState([]);
-  const saveImagesToLocal = async (images) => {
+  const [loading, setLoading] = useState(false);
+  const saveImagesToLocal = async () => {
     try {
       await AsyncStorage.setItem("storedImages", JSON.stringify(images));
-      Alert.alert("Success", "Images saved to local storage!");
     } catch (error) {
-      Alert.alert("Error", "Failed to save images.");
-      console.error(error);
-    }
-  };
-
-  const loadImagesFromLocal = async () => {
-    try {
-      const storedImages = await AsyncStorage.getItem("storedImages");
-      if (storedImages) {
-        setImages(JSON.parse(storedImages));
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to load images.");
       console.error(error);
     }
   };
   //Load initial local stored images
   useEffect(() => {
+    const loadImagesFromLocal = async () => {
+      try {
+        const storedImages = await AsyncStorage.getItem("storedImages");
+        if (storedImages) {
+          setImages(JSON.parse(storedImages));
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
     loadImagesFromLocal();
   }, []);
-
+  // Upload to server
+  const Upload = async () => {
+    if (!images.length) {
+      Alert.alert("No Images", "Please select images before uploading.");
+      return;
+    }
+    setLoading(true);
+    try {
+      setLoading(true);
+      const { data } = await axios.post("/images/uploadImages", images);
+      // setImages(data);
+      await saveImagesToLocal();
+      Alert.alert("Success", "Images uploaded successfully!");
+    } catch (error) {
+      Alert.alert("Error", error.response?.data?.message || "Upload failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
   const openPicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: "images",
@@ -64,42 +80,8 @@ const AddImages = () => {
   const removeImage = async (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     //update images to local storages
-    saveImagesToLocal(images);
-  };
-
-  const uploadImages = async () => {
-    if (images.length === 0) {
-      Alert.alert("No Images", "Please select images before uploading.");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      images.forEach((uri, index) => {
-        formData.append(`image_${index}`, {
-          uri,
-          name: `image_${index}.jpg`,
-          type: "image/jpeg",
-        });
-      });
-
-      const response = await fetch("https://your-server.com/upload", {
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        Alert.alert("Success", "Images uploaded successfully!");
-      } else {
-        Alert.alert("Error", "Failed to upload images.");
-      }
-    } catch (error) {
-      Alert.alert("Error", "An error occurred during upload.");
-      console.error(error);
-    }
+    await saveImagesToLocal(images);
+    await Upload();
   };
 
   return (
@@ -136,7 +118,7 @@ const AddImages = () => {
           </View>
         ))}
       </View>
-      <TouchableOpacity onPress={uploadImages} style={styles.uploadButton}>
+      <TouchableOpacity onPress={Upload} style={styles.uploadButton}>
         <Text style={styles.uploadButtonText}>Upload Images</Text>
       </TouchableOpacity>
     </SafeAreaView>

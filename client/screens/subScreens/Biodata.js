@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import FormField from "../../components/Forms/FormField";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const districts = [
   "Ahmednagar",
@@ -52,15 +53,10 @@ const districts = [
   "Washim",
   "Yavatmal",
 ];
-
 const maritalStatuses = ["Single", "Divorced", "Widowed"];
 const incomeOptions = ["Less than 10 Lakh", "More than 10 Lakh"];
 
 const Biodata = () => {
-  //Global State variables
-  // const [state, setState] = useContext(AuthContext);
-  // const { user, token } = state;
-  // Local State variables
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     fullname: "",
@@ -76,7 +72,19 @@ const Biodata = () => {
     familyDetails: "",
     partnerExpectations: "",
   });
-
+  //Load initial local stored biodata
+  useEffect(() => {
+    const loadBiodataFromLocal = async () => {
+      try {
+        const storedBiodata = await AsyncStorage.getItem("storedBiodata");
+        if (storedBiodata) setForm(JSON.parse(storedBiodata));
+      } catch (error) {
+        console.error("Failed to load local biodata:", error);
+        Alert.alert("Error", "Oops.. No local data found. Loading from server");
+      }
+    };
+    loadBiodataFromLocal();
+  }, []);
   const validateForm = () => {
     const emptyFields = Object.keys(form).filter((key) => !form[key]);
     if (emptyFields.length) {
@@ -89,53 +97,33 @@ const Biodata = () => {
     return true;
   };
   const saveBiodataToLocal = async () => {
-    if (!validateForm()) return;
     setLoading(true);
-    console.log(form);
-
     try {
       await AsyncStorage.setItem("storedBiodata", JSON.stringify(form));
       Alert.alert("Success", "Biodata saved to local storage!");
     } catch (error) {
       setLoading(false);
-      Alert.alert("Error", "Failed to save biodata.");
+      Alert.alert("Error", "Failed to save biodata on local storage.");
       console.error(error);
     } finally {
       setLoading(false);
-      // setForm({
-      //   fullname: "",
-      //   aboutme: "",
-      //   work: "",
-      //   education: "",
-      //   livesin: "",
-      //   hometown: "",
-      //   hobies: "",
-      //   height: "",
-      //   maritalStatus: "",
-      //   income: "",
-      //   familyDetails: "",
-      //   partnerExpectations: "",
-      // });
     }
   };
 
   const submit = async () => {
     if (!validateForm()) return;
     setLoading(true);
-    console.log(form);
     try {
       setLoading(true);
-      const { data } = await axios.put("/auth/update-user", {
-        ...form,
-      });
-      setLoading(false);
-      let updatedData = JSON.stringify(data);
-      setForm(updatedData);
-      alert("Biodata updated sucessfully", data.message);
+      const { data } = await axios.post("/profile/updateProfile", form);
+      setForm(data);
+      await saveBiodataToLocal();
+      Alert.alert("Success", "Biodata updated successfully!");
     } catch (error) {
-      alert(error.responce.data.message);
+      console.error("API Error:", error.response?.data || error.message);
+      Alert.alert("Error", error.response?.data?.message || "Update failed.");
+    } finally {
       setLoading(false);
-      console.log(error);
     }
   };
 
@@ -322,7 +310,7 @@ const Biodata = () => {
             <FormField
               title="Partner Expectations"
               value={form.partnerExpectations}
-              placeholder="Write about your expectations for your partner (e.g., qualities, profession, etc.)"
+              placeholder="Write about your expectations for your partner"
               handleChangeText={(value) =>
                 setForm((prev) => ({ ...prev, partnerExpectations: value }))
               }
@@ -331,7 +319,7 @@ const Biodata = () => {
             />
           </View>
           <TouchableOpacity
-            onPress={saveBiodataToLocal}
+            onPress={submit}
             style={[styles.publishBtn, loading && { opacity: 0.6 }]}
             disabled={loading}
           >
