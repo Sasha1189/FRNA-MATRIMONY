@@ -24,6 +24,7 @@ const ProfileDisplay = ({ item }) => {
     );
   }
   const Biodata = item?.profile;
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollViewContainer}>

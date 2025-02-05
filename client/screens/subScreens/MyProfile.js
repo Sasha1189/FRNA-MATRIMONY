@@ -1,51 +1,53 @@
-import { SafeAreaView, StyleSheet } from "react-native";
+import { Text, SafeAreaView, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProfileDisplay from "../../components/SubComp/ProfileDisplay";
 
 const MyProfile = () => {
-  const [images, setImages] = useState([]);
-  const [Biodata, setBiodata] = useState({});
-  const loadImagesFromLocal = async () => {
-    try {
-      const storedImages = await AsyncStorage.getItem("storedImages");
-      if (storedImages) {
-        setImages(JSON.parse(storedImages));
-        setUser({
-          id: "xyz1",
-          images: images,
-          biodata: "",
-        });
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to load images.");
-      console.error(error);
-    }
-  };
-  const loadBiodataFromLocal = async () => {
-    try {
-      const storedBiodata = await AsyncStorage.getItem("storedBiodata");
-      if (storedBiodata) {
-        setBiodata(JSON.parse(storedBiodata));
-        setUser({
-          id: "xyz1",
-          images: images,
-          biodata: Biodata,
-        });
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to load images.");
-      console.error(error);
-    }
-  };
+  const [loading, setLoading] = useState(true);
+  const [item, setItem] = useState({
+    id: "xyz",
+    image: {},
+    profile: {},
+  });
+
   useEffect(() => {
-    loadImagesFromLocal();
-    loadBiodataFromLocal();
+    const loadAuthUserDataFromLocal = async () => {
+      try {
+        const storedBiodata = JSON.parse(
+          await AsyncStorage.getItem("storedBiodata")
+        );
+        const storedImages = JSON.parse(
+          await AsyncStorage.getItem("storedImages")
+        );
+
+        if (storedBiodata && storedImages) {
+          setLoading(false);
+          setItem({
+            id: "xyz",
+            image: { imageUrls: storedImages },
+            profile: storedBiodata,
+          });
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to load images.");
+        console.error(error);
+      }
+    };
+    loadAuthUserDataFromLocal();
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <ProfileDisplay item={item} />
+      {loading ? (
+        <SafeAreaView style={styles.container}>
+          <Text style={{ color: "white", textAlign: "center" }}>
+            Loading Profile...
+          </Text>
+        </SafeAreaView>
+      ) : (
+        <ProfileDisplay item={item} />
+      )}
     </SafeAreaView>
   );
 };
