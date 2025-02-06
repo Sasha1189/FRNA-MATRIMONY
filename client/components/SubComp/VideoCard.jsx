@@ -9,7 +9,6 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import IconButton from "./IconButton";
 import ImageCarousal from "./ImageCarousal";
-import DynymicUserProfile from "../../screens/subScreens/DynymicUserProfile";
 
 const { width, height } = Dimensions.get("window");
 const ITEMSIZE = width * 0.95;

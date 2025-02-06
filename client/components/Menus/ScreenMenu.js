@@ -12,6 +12,8 @@ import AddImages from "../../screens/subScreens/AddImages";
 import MyProfile from "../../screens/subScreens/MyProfile";
 import DynymicUserProfile from "../../screens/subScreens/DynymicUserProfile";
 import FiltersScreen from "../../screens/FiltersScreen";
+import AppLogo from "./AppLogo";
+import HeaderIcons from "./HeaderIcons";
 
 const ScreenMenu = () => {
   // Access the global state
@@ -28,6 +30,9 @@ const ScreenMenu = () => {
             component={HomeScreen}
             options={{
               headerShown: true,
+              headerTitle: "",
+              headerLeft: () => <AppLogo />,
+              headerRight: () => <HeaderIcons />,
             }}
           />
           <Stack.Screen

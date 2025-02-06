@@ -35,7 +35,7 @@ const IconButton = ({ name, size, color, handlePress }) => {
           justifyContent: "center",
           alignItems: "center",
           borderColor: color,
-          borderWidth: 0.2,
+          // borderWidth: 0.2,
           transform: [{ scale }],
           ...style,
         }}
