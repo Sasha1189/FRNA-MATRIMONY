@@ -51,7 +51,6 @@ const HomeScreen = () => {
           data={profiles}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => <VideoCard item={item} />}
-          contentContainerStyle={styles.listContainer}
           pagingEnabled
           snapToAlignment="center"
           decelerationRate="fast"

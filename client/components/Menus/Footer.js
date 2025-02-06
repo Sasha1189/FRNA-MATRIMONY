@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around", // Equal spacing between icons
     alignItems: "center", // Align icons vertically
-    backgroundColor: "gray",
+    // backgroundColor: "gray",
     width: width,
   },
   iconContainer: {

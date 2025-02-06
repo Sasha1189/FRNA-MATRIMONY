@@ -6,11 +6,10 @@ const AppLogo = () => {
     <Image
       source={require("../../assets/icons/images.jpeg")}
       style={{
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        // borderWidth: 1,
-        marginLeft: 16,
+        width: 55,
+        height: 55,
+        borderRadius: 30,
+        marginLeft: 15,
       }}
       resizeMode="contain"
     />

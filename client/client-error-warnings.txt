@@ -31,3 +31,29 @@ store IP address of profile creator for one year from the date of activation,”
 6.People who register will need to authenticate with true copies of identity and address 
 proofs. This is further aimed at checking the posting of obscene materials and guard the 
 websites from becoming dating platforms
+
+#00eda6 (Bright Teal)
+#ff006f (Hot Pink)
+#07A6FF (Vivid Blue)
+#FFA500 – Bright Orange
+#FFC107 – Warm Amber
+#FFEE58 – Vibrant Yellow
+#F44336 – Fiery Red
+#8BC34A – Fresh Lime Green
+#9C27B0 – Deep Vibrant Purple
+#FF5722 – Bold Orange-Red
+#CDDC39 – Zesty Lime
+#FFF176 – Sunny Pastel Yellow
+#BDBDBD – Neutral Gray (for balance)
+
+controll transparency by adding last
+Opacity Percentages and Hex Values
+% Opacity	Hex
+0% (clear)	00
+10%	1A
+25%	40
+50%	80
+75%	BF
+90%	E6
+100% (solid)	FF
+eg.backgroundColor: "#1E1E2D80" see at last 80 corresponds to 50%

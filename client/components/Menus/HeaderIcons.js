@@ -1,13 +1,20 @@
 import React from "react";
 import { View, Image, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import { useNavigation } from "@react-navigation/native";
+import IconButton from "../SubComp/IconButton";
 
 const HeaderIcons = () => {
+  const navigation = useNavigation();
   const onSearchPress = () => {
     // Navigate to search screen or open search modal
   };
   const onFilterPress = () => {
     // Navigate to filter screen or open filter modal
+  };
+  const COLORS = {
+    like: "#00eda6",
+    nope: "#ff006f",
+    star: "#07A6FF",
   };
 
   return (
@@ -16,26 +23,29 @@ const HeaderIcons = () => {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-end",
-        // marginRight: 1,
-        // borderWidth: 1,
+        marginTop: 5,
       }}
     >
-      <TouchableOpacity onPress={onSearchPress} style={{}}>
-        <Image
-          source={require("../../assets/icons/chatt1.png")}
-          style={{ width: 40, height: 40 }}
-          resizeMode="contain"
+      <View>
+        <IconButton
+          name="search"
+          size={24}
+          color={COLORS.star}
+          bgColor={"transparent"}
+          style={{ elevation: 0, height: 50, width: 50 }}
+          handlePress={() => navigation.navigate("")}
         />
-        {/* <Icon name="search" size={24} color="#fff" /> */}
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onFilterPress} style={{ marginLeft: 20 }}>
-        <Image
-          source={require("../../assets/icons/filter1.png")}
-          style={{ width: 40, height: 40 }}
-          resizeMode="contain"
+      </View>
+      <View>
+        <IconButton
+          name="sliders"
+          size={24}
+          color={COLORS.star}
+          bgColor={"transparent"}
+          style={{ elevation: 0, height: 50, width: 50, marginLeft: 20 }}
+          handlePress={() => navigation.navigate("")}
         />
-        {/* <Icon name="filter-list" size={24} color="#fff" /> */}
-      </TouchableOpacity>
+      </View>
     </View>
   );
 };
