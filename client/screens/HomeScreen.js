@@ -12,6 +12,7 @@ import EmptyList from "../components/SubComp/EmptyList";
 import Footer from "../components/Menus/Footer";
 import axios from "axios";
 import { AuthContext } from "../context/authContext";
+import HeaderIcons from "../components/Menus/HeaderIcons";
 
 const { height, width } = Dimensions.get("window");
 
@@ -46,6 +47,9 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <HeaderIcons />
+      </View>
       <View style={styles.flatListContainer}>
         <FlatList
           data={profiles}
@@ -74,15 +78,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  footer: {
-    alignItems: "center",
-    justifyContent: "flex-end",
+  header: {
+    justifyContent: "flex-start",
+    // elevation: 1,
   },
   flatListContainer: {
     flex: 1,
     borderRadius: 10,
     margin: 5,
     overflow: "hidden",
+  },
+  footer: {
+    justifyContent: "flex-end",
+    // borderWidth: 1,
   },
 });
 

@@ -85,15 +85,15 @@ export default VideoCard;
 
 const styles = StyleSheet.create({
   cardContainer: {
-    // width: width,
-    // height: height * 0.9,
-    // borderRadius: 20,
+    width: width,
+    height: height * 0.9,
+    borderRadius: 20,
     overflow: "hidden",
     alignSelf: "center",
   },
   videoCard: {
-    // width: width,
-    // height: height * 0.9, // Occupy most of the screen
+    width: width,
+    height: height * 0.9, // Occupy most of the screen
     justifyContent: "center",
     alignItems: "center",
   },

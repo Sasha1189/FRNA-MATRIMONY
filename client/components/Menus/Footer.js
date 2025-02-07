@@ -14,7 +14,6 @@ const COLORS = {
 const Footer = () => {
   const [state, setState] = useContext(AuthContext);
   const navigation = useNavigation();
-  const route = useRoute();
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.iconContainer}>
@@ -38,7 +37,7 @@ const Footer = () => {
           name="commenting-o"
           size={24}
           color={COLORS.star}
-          handlePress={() => navigation.navigate("Home")}
+          handlePress={() => navigation.navigate("Chat")}
         />
       </TouchableOpacity>
     </View>
@@ -49,7 +48,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around", // Equal spacing between icons
     alignItems: "center", // Align icons vertically
-    // backgroundColor: "gray",
     width: width,
   },
   iconContainer: {

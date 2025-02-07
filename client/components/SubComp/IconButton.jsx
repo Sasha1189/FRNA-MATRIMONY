@@ -29,7 +29,7 @@ const IconButton = ({ name, size, color, bgColor, style, handlePress }) => {
         style={{
           height: 50,
           width: 50,
-          backgroundColor: bgColor ?? "#1E1E2D",
+          backgroundColor: bgColor ?? "#1E1E2DE6",
           elevation: 5,
           borderRadius: 40,
           justifyContent: "center",
