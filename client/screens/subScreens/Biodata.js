@@ -72,19 +72,58 @@ const Biodata = () => {
     familyDetails: "",
     partnerExpectations: "",
   });
-  //Load initial local stored biodata
+  //for data filter
+  const filterProfileData = (profileData) => {
+    return {
+      fullname: profileData.fullname || "",
+      aboutme: profileData.aboutme || "",
+      education: profileData.education || "",
+      work: profileData.work || "",
+      height: profileData.height || "",
+      livesin: profileData.livesin || "",
+      hometown: profileData.hometown || "",
+      income: profileData.income || "",
+      hobbies: profileData.hobbies || [], // Ensure hobbies is an array
+      maritalStatus: profileData.maritalStatus || "",
+      familyDetails: profileData.familyDetails || "",
+      partnerExpectations: profileData.partnerExpectations || "",
+    };
+  };
+  //Load initial local stored biodata if not server
   useEffect(() => {
-    const loadBiodataFromLocal = async () => {
+    const loadBiodata = async () => {
       try {
         const storedBiodata = await AsyncStorage.getItem("storedBiodata");
-        if (storedBiodata) setForm(JSON.parse(storedBiodata));
+
+        if (storedBiodata) {
+          const parsedData = JSON.parse(storedBiodata);
+          // Ensure the data is valid before setting state
+          if (parsedData && parsedData._id) {
+            setForm(filterProfileData(parsedData));
+            return; // Exit to prevent unnecessary server call
+          }
+        }
+        // If no valid local data, fetch from server
+        const { data } = await axios.get("/profile/myprofile");
+
+        if (data?.currentUserProfile) {
+          const filteredProfile = filterProfileData(data.currentUserProfile);
+          setForm(filteredProfile);
+
+          // Store fetched data in AsyncStorage for next time
+          await AsyncStorage.setItem(
+            "storedBiodata",
+            JSON.stringify(filteredProfile)
+          );
+        }
       } catch (error) {
-        console.error("Failed to load local biodata:", error);
-        Alert.alert("Error", "Oops.. No local data found. Loading from server");
+        console.error("Error loading biodata:", error);
       }
     };
-    loadBiodataFromLocal();
+
+    loadBiodata();
   }, []);
+
   const validateForm = () => {
     const emptyFields = Object.keys(form).filter((key) => !form[key]);
     if (emptyFields.length) {
@@ -100,10 +139,8 @@ const Biodata = () => {
     setLoading(true);
     try {
       await AsyncStorage.setItem("storedBiodata", JSON.stringify(form));
-      Alert.alert("Success", "Biodata saved to local storage!");
     } catch (error) {
       setLoading(false);
-      Alert.alert("Error", "Failed to save biodata on local storage.");
       console.error(error);
     } finally {
       setLoading(false);

@@ -18,6 +18,7 @@ const MAX_IMAGES = 4;
 const AddImages = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const saveImagesToLocal = async () => {
     try {
       await AsyncStorage.setItem("storedImages", JSON.stringify(images));
@@ -25,20 +26,39 @@ const AddImages = () => {
       console.error(error);
     }
   };
-  //Load initial local stored images
+
+  //Load initial images
   useEffect(() => {
-    const loadImagesFromLocal = async () => {
+    const loadImages = async () => {
       try {
         const storedImages = await AsyncStorage.getItem("storedImages");
+
         if (storedImages) {
-          setImages(JSON.parse(storedImages));
+          const parsedImages = JSON.parse(storedImages);
+          // Ensure valid stored data before setting state
+          if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+            setImages(parsedImages);
+            return; // Exit to prevent unnecessary server call
+          }
+        }
+
+        // If no valid local data, fetch from server
+        const { data } = await axios.get("/images/myImages");
+        const userImages = data?.userImages;
+        if (userImages) {
+          setImages(userImages);
+          await AsyncStorage.setItem(
+            "storedImages",
+            JSON.stringify(userImages)
+          );
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error loading images:", error);
       }
     };
-    loadImagesFromLocal();
+    loadImages();
   }, []);
+
   // Upload to server
   const Upload = async () => {
     if (!images.length) {

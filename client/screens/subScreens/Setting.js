@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import React, { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
@@ -18,8 +17,10 @@ const Setting = () => {
   const navigation = useNavigation();
   // logout
   const handleLogout = async () => {
-    setState({ token: "", user: null });
     await AsyncStorage.removeItem("@auth");
+    await AsyncStorage.removeItem("storedImages");
+    await AsyncStorage.removeItem("storedBiodata");
+    setState({ token: "", user: null });
     alert("logout successfully");
   };
 

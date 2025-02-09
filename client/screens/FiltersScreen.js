@@ -30,13 +30,13 @@ const FiltersScreen = () => {
     setIncomeIdx(0);
     setMaritalStatusIdx(0);
     // Call applyFilters with defaults so that all profiles are shown
-    applyFilters(DEFAULT_MIN_HEIGHT, incomeOptions[0], maritalStatuses[0]);
+    applyFilters(incomeOptions[0], maritalStatuses[0]);
   };
 
-  const applyFilters = async (height, income, maritalStatus) => {
+  const applyFilters = async (income, maritalStatus) => {
     try {
       // Construct query params
-      const params = { minHeight: height, income, maritalStatus };
+      const params = { income, maritalStatus };
       const response = await axios.get("/profiles", { params });
 
       // Navigate back to HomeScreen with filtered profiles or update state accordingly.
@@ -54,7 +54,7 @@ const FiltersScreen = () => {
   const handleApply = () => {
     applyFilters(
       // minAge,
-      minHeight,
+      // minHeight,
       incomeOptions[incomeIdx],
       maritalStatuses[maritalStatusIdx]
     );
