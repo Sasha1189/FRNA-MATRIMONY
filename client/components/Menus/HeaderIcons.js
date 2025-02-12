@@ -2,7 +2,6 @@ import React from "react";
 import { View, Image, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import IconButton from "../SubComp/IconButton";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const HeaderIcons = () => {
   const navigation = useNavigation();
@@ -17,13 +16,11 @@ const HeaderIcons = () => {
       style={{
         flexDirection: "row",
         justifyContent: "space-around",
-        // borderWidth: 1,
       }}
     >
       <View
         style={{
           flexDirection: "row",
-          // borderWidth: 1,
           alignItems: "center",
         }}
       >
@@ -55,7 +52,6 @@ const HeaderIcons = () => {
       <View
         style={{
           flexDirection: "row",
-          // borderWidth: 1,
           alignItems: "center",
         }}
       >
@@ -65,7 +61,7 @@ const HeaderIcons = () => {
           color={COLORS.star}
           bgColor={"transparent"}
           style={{ elevation: 0, height: 50, width: 50, marginRight: 15 }}
-          handlePress={() => navigation.navigate("")}
+          handlePress={() => navigation.navigate("SearchScreen")}
         />
         <IconButton
           name="sliders"

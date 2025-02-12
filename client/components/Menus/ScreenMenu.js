@@ -11,8 +11,7 @@ import AddImages from "../../screens/subScreens/AddImages";
 import MyProfile from "../../screens/subScreens/MyProfile";
 import DynymicUserProfile from "../../screens/subScreens/DynymicUserProfile";
 import FiltersScreen from "../../screens/FiltersScreen";
-import AppLogo from "./AppLogo";
-import HeaderIcons from "./HeaderIcons";
+import SearchScreen from "../../screens/SearchScreen";
 import Chat from "../../screens/Chat";
 
 const ScreenMenu = () => {
@@ -30,21 +29,25 @@ const ScreenMenu = () => {
             component={HomeScreen}
             options={{
               headerShown: false,
-              // headerTitle: "LONARI",
-              // headerLeft: () => <AppLogo />,
-              // headerRight: () => <HeaderIcons />,
             }}
           />
           <Stack.Screen
             name="DynymicUserProfile"
             component={DynymicUserProfile}
             options={{
-              headerShown: true,
+              headerShown: false,
             }}
           />
           <Stack.Screen
             name="FiltersScreen"
             component={FiltersScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="SearchScreen"
+            component={SearchScreen}
             options={{
               headerShown: false,
             }}
@@ -68,7 +71,7 @@ const ScreenMenu = () => {
             name="MyProfile"
             component={MyProfile}
             options={{
-              headerShown: true,
+              headerShown: false,
             }}
           />
           <Stack.Screen

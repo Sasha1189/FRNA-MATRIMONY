@@ -73,8 +73,15 @@ const ImageCarousal = ({ images }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    width: "100%",
+    height: "100%", // Fills the parent container (which is VideoCard)
   },
   item: {
+    // alignItems: "center",
+    // justifyContent: "center",
+    // overflow: "hidden",
+    // width: "100%", // Since VideoCard is fixed at width: width
+    // height: "100%",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
@@ -84,8 +91,10 @@ const styles = StyleSheet.create({
   },
   image: {
     width: width,
-    height: height * 0.9,
+    height: height * 0.8,
     resizeMode: "cover",
+    // width: "100%",
+    // height: "100%",
   },
 });
 

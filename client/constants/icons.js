@@ -23,6 +23,7 @@ import chatnews from "../assets/icons/chatnews.png";
 import usered from "../assets/icons/usered.png";
 
 export default {
+  search,
   camera,
   usered,
 };
