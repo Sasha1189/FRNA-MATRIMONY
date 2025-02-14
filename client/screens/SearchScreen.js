@@ -62,12 +62,14 @@ const SearchScreen = () => {
         setLoading(false);
       }
     },
-    [query, loading, hasMore] // Depends only on `page`, not `query`
+    [loading, hasMore] // Depends only on `page`, not `query`
   );
 
   // Handle search manually (not in `useEffect`)
   const handleSearch = () => {
     // setPage(DEFAULT_PAGE);
+    setProfiles([]);
+    setHasMore(true);
     searchProfiles(query, true);
   };
 
