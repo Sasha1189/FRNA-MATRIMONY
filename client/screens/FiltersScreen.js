@@ -24,40 +24,25 @@ const FiltersScreen = () => {
   const [maritalStatusIdx, setMaritalStatusIdx] = useState(0);
   const navigation = useNavigation();
 
-  const handleClear = () => {
-    setMinAge(DEFAULT_MIN_AGE);
-    setMinHeight(DEFAULT_MIN_HEIGHT);
-    setIncomeIdx(0);
-    setMaritalStatusIdx(0);
-    // Call applyFilters with defaults so that all profiles are shown
-    applyFilters(incomeOptions[0], maritalStatuses[0]);
-  };
-
-  const applyFilters = async (income, maritalStatus) => {
+  const applyFilters = async () => {
     try {
-      // Construct query params
-      const params = { income, maritalStatus };
-      const response = await axios.get("/profiles", { params });
-
-      // Navigate back to HomeScreen with filtered profiles or update state accordingly.
-      navigation.navigate("HomeScreen", { profiles: response.data.profiles });
-      console.log("Applied filters:", params);
+      const income = incomeOptions[incomeIdx];
+      const maritalStatus = maritalStatuses[maritalStatusIdx];
+      // Navigate to HomeScreen with filterParams
+      navigation.navigate("HomeScreen", {
+        filterParams: {
+          income,
+          maritalStatus,
+        },
+      });
     } catch (error) {
-      console.error("Error applying filters:", error);
-      Alert.alert(
-        "Error",
-        error.response?.data?.message || "Failed to apply filters"
-      );
+      Alert.alert("Error", "Failed to apply filters");
     }
   };
 
-  const handleApply = () => {
-    applyFilters(
-      // minAge,
-      // minHeight,
-      incomeOptions[incomeIdx],
-      maritalStatuses[maritalStatusIdx]
-    );
+  const clearFilters = () => {
+    // ✅ Navigate to HomeScreen with no filterParams
+    navigation.navigate("HomeScreen", { filterParams: null });
   };
 
   return (
@@ -110,10 +95,10 @@ const FiltersScreen = () => {
 
         {/* Buttons */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
+          <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
             <Text style={styles.buttonText}>Clear all</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
+          <TouchableOpacity style={styles.applyButton} onPress={applyFilters}>
             <Text style={styles.buttonText}>Apply filters</Text>
           </TouchableOpacity>
         </View>

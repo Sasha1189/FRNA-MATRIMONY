@@ -1,4 +1,11 @@
-import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native";
 import React, {
   useEffect,
   useContext,
@@ -7,6 +14,7 @@ import React, {
   useRef,
 } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRoute } from "@react-navigation/native";
 import VideoCard from "../components/SubComp/VideoCard";
 import EmptyList from "../components/SubComp/EmptyList";
 import Footer from "../components/Menus/Footer";
@@ -18,21 +26,37 @@ const { height, width } = Dimensions.get("window");
 const ITEM_HEIGHT = height * 0.9; // Fixed height per card
 
 const HomeScreen = () => {
+  const route = useRoute();
+
+  // If filterParams is undefined or null, we fetch all profiles
+  const filterParams = route.params?.filterParams || null;
+
   const [state] = useContext(AuthContext);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Single fetch function to handle normal or filtered requests
   const fetchProfiles = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await axios.get("/auth/profiles");
-      setProfiles(response.data.profiles || []); // Ensure profiles is always an array
+      let response;
+      if (filterParams) {
+        // If we have filters, call the filter endpoint
+        response = await axios.get("/profile/filters", {
+          params: filterParams,
+        });
+      } else {
+        // Otherwise, fetch all opposite-gender profiles
+        response = await axios.get("/profile/oppGenProfiles");
+      }
+      setProfiles(response.data.profiles || []);
     } catch (error) {
       console.error("Error fetching profiles:", error);
     } finally {
       setLoading(false);
     }
-  }, [state?.token]);
+  }, [filterParams]);
 
   useEffect(() => {
     fetchProfiles();
@@ -60,6 +84,14 @@ const HomeScreen = () => {
     }),
     []
   );
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#000" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>

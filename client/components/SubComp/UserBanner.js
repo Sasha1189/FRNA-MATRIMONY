@@ -1,9 +1,26 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const UserBanner = ({ item }) => {
-  const onPressProfile = () => {
-    console.log("Pressed me");
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
+
+  const onPressProfile = async () => {
+    setLoading(true);
+    try {
+      const dynamicUserId = item?.userId;
+      // Construct query params
+      const params = { dynamicUserId };
+      const response = await axios.get("/profile/dynamicUser", { params });
+      let profile = response?.data?.profile || [];
+      navigation.navigate("DynymicUserProfile", { item: profile });
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <TouchableOpacity style={styles.profileItem} onPress={onPressProfile}>
@@ -11,7 +28,7 @@ const UserBanner = ({ item }) => {
         source={
           require("../../assets/images/profile.png")
           //   { uri: item.image?.imageUrls?.[0] }
-        } // CHANGE: Adjust based on your data
+        }
         style={styles.profileImage}
       />
       <View style={styles.profileInfo}>
@@ -31,10 +48,10 @@ const styles = StyleSheet.create({
   profileItem: {
     flexDirection: "row",
     alignItems: "center",
+    margin: 4,
     padding: 16,
-    borderBottomColor: "#333",
-    borderBottomWidth: 1,
-    backgroundColor: "#222",
+    borderWidth: 1,
+    borderRadius: 16,
   },
   profileImage: {
     width: 60,
@@ -48,11 +65,11 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#fff",
+    color: "#222",
   },
   profileDetails: {
     fontSize: 14,
-    color: "#ccc",
+    color: "#aaa",
     marginTop: 4,
   },
 });
