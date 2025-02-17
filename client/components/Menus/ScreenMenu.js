@@ -12,7 +12,8 @@ import MyProfile from "../../screens/subScreens/MyProfile";
 import DynymicUserProfile from "../../screens/subScreens/DynymicUserProfile";
 import FiltersScreen from "../../screens/FiltersScreen";
 import SearchScreen from "../../screens/SearchScreen";
-import Chat from "../../screens/Chat";
+import ChatListScreen from "../../screens/Chat";
+import ChatRoomScreen from "../../screens/subScreens/ChatRoomScreen";
 
 const ScreenMenu = () => {
   // Access the global state
@@ -54,12 +55,18 @@ const ScreenMenu = () => {
           />
           <Stack.Screen
             name="Chat"
-            component={Chat}
+            component={ChatListScreen}
             options={{
               headerShown: true,
             }}
           />
-
+          <Stack.Screen
+            name="ChatRoomScreen"
+            component={ChatRoomScreen}
+            options={{
+              headerShown: true,
+            }}
+          />
           <Stack.Screen
             name="Profile"
             component={Profile}

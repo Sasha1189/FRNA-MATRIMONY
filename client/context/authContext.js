@@ -14,7 +14,7 @@ const AuthProvider = ({ children }) => {
   });
   //default axios setting
   axios.defaults.headers.common["Authorization"] = `Bearer ${state?.token}`;
-  axios.defaults.baseURL = "http://192.168.141.147:8080/api/v1";
+  axios.defaults.baseURL = "http://192.168.237.147:8080/api/v1";
   //  " https://fullstack-backend-rn-app.onrender.com/api/v1";
 
   //Initial local storage data
