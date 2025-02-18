@@ -129,23 +129,28 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#f2f2f2",
   },
   header: {
     justifyContent: "flex-start",
-    borderWidth: 1,
-    // elevation: 1,
+    padding: 2,
+    borderBottomWidth: 0.5,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
   },
   flatListContainer: {
     flex: 1,
     borderRadius: 10,
     margin: 5,
     overflow: "hidden",
-    borderWidth: 1,
+    // borderWidth: 1,
   },
   footer: {
     justifyContent: "flex-end",
-    borderWidth: 1,
+    padding: 2,
+    borderTopWidth: 0.5,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
   },
 });
 

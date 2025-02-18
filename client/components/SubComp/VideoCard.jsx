@@ -14,8 +14,11 @@ const COLORS = {
 
 const VideoCard = ({ item }) => {
   const navigation = useNavigation();
-  const handlePress = () => {
+  const toDynymicUserProfile = () => {
     navigation.navigate("DynymicUserProfile", { item: item });
+  };
+  const toChatRoom = () => {
+    navigation.navigate("ChatRoomScreen", { otherUserId: item._id });
   };
   return (
     <View style={styles.cardContainer}>
@@ -47,6 +50,7 @@ const VideoCard = ({ item }) => {
               width: 40,
               margin: 4,
             }}
+            // handlePress={toAddLike}
           />
           <IconButton
             name="commenting-o"
@@ -60,6 +64,7 @@ const VideoCard = ({ item }) => {
               width: 40,
               margin: 4,
             }}
+            handlePress={toChatRoom}
           />
           <IconButton
             name="info"
@@ -73,7 +78,7 @@ const VideoCard = ({ item }) => {
               width: 40,
               margin: 4,
             }}
-            handlePress={handlePress}
+            handlePress={toDynymicUserProfile}
           />
         </View>
       </View>

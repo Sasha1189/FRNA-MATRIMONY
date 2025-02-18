@@ -1,7 +1,6 @@
 import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import React, { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import IconButton from "../SubComp/IconButton";
 
@@ -11,9 +10,12 @@ const COLORS = {
   nope: "#ff006f",
   star: "#07A6FF",
 };
+
 const Footer = () => {
-  const [state, setState] = useContext(AuthContext);
+  const [state] = useContext(AuthContext);
   const navigation = useNavigation();
+  const route = useRoute(); // gives us the current route info
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.iconContainer}>

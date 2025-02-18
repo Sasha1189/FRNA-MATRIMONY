@@ -15,13 +15,14 @@ const HeaderIcons = () => {
     <View
       style={{
         flexDirection: "row",
-        justifyContent: "space-around",
+        justifyContent: "space-between",
       }}
     >
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
+          marginLeft: 10,
         }}
       >
         <Image
@@ -30,7 +31,7 @@ const HeaderIcons = () => {
             width: 50,
             height: 50,
             borderRadius: 25,
-            marginRight: 20,
+            marginRight: 10,
             borderWidth: 0.5,
             borderColor: "#ff006f",
           }}
@@ -53,22 +54,23 @@ const HeaderIcons = () => {
         style={{
           flexDirection: "row",
           alignItems: "center",
+          marginRight: 10,
         }}
       >
         <IconButton
           name="search"
-          size={24}
+          size={20}
           color={COLORS.star}
           bgColor={"transparent"}
-          style={{ elevation: 0, height: 50, width: 50, marginRight: 15 }}
+          style={{ elevation: 0, height: 45, width: 45, marginRight: 5 }}
           handlePress={() => navigation.navigate("SearchScreen")}
         />
         <IconButton
           name="sliders"
-          size={24}
+          size={20}
           color={COLORS.star}
           bgColor={"transparent"}
-          style={{ elevation: 0, height: 50, width: 50 }}
+          style={{ elevation: 0, height: 45, width: 45 }}
           handlePress={() => navigation.navigate("FiltersScreen")}
         />
       </View>

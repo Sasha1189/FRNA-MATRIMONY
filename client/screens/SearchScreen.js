@@ -133,9 +133,9 @@ const styles = StyleSheet.create({
     // paddingTop: 16,
   },
   contentContainer: {
-    padding: 20,
-    borderWidth: 1,
-    borderRadius: 16,
+    padding: 10,
+    // borderWidth: 1,
+    // borderRadius: 16,
   },
   loader: {
     marginTop: 50,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     height: 54,
     backgroundColor: "#CDCDE0" || "#1E1E2D",
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: "#333",
   },
   textInput: {

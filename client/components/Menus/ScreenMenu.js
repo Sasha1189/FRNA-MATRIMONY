@@ -57,14 +57,14 @@ const ScreenMenu = () => {
             name="Chat"
             component={ChatListScreen}
             options={{
-              headerShown: true,
+              headerShown: false,
             }}
           />
           <Stack.Screen
             name="ChatRoomScreen"
             component={ChatRoomScreen}
             options={{
-              headerShown: true,
+              headerShown: false,
             }}
           />
           <Stack.Screen
