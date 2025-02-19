@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
-import EmptyList from "../components/SubComp/EmptyList";
-import UserBanner from "../components/SubComp/UserBanner";
+import EmptyList from "../../components/SubComp/EmptyList";
+import UserBanner from "../../components/SubComp/UserBanner";
 
 const { height } = Dimensions.get("window");
 const ITEM_HEIGHT = height * 0.9;
@@ -90,7 +90,7 @@ const SearchScreen = () => {
           />
           <TouchableOpacity onPress={handleSearch}>
             <Image
-              source={require("../assets/icons/search.png")}
+              source={require("../../assets/icons/search.png")}
               style={styles.icon}
               resizeMode="contain"
             />

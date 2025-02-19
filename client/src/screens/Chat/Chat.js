@@ -9,9 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import io from "socket.io-client";
-import IconButton from "../components/SubComp/IconButton";
-import { AuthContext } from "../context/authContext";
-import Footer from "../components/Menus/Footer";
+import { AuthContext } from "../../context/authContext";
+import Footer from "../../components/Menus/Footer";
 
 const COLORS = {
   like: "#00eda6",
@@ -161,7 +160,7 @@ const ChatListScreen = ({ navigation }) => {
             >
               <Image
                 source={
-                  require("../assets/images/profile.png")
+                  require("../../assets/images/profile.png")
                   //   { uri: item.image?.imageUrls?.[0] }
                 }
                 style={styles.profileImage}

@@ -21,7 +21,7 @@ const Footer = () => {
           name="user-o"
           size={24}
           color={COLORS.like}
-          bgColor={route.name === "Profile" ? "#1E1E2DE6" : "#1E1E2D40"}
+          bgColor={route.name === "Profile" ? "#1E1E2DE6" : "#1E1E2D1A"}
           elev={route.name === "Profile" ? 5 : null}
           handlePress={
             route.name === "Profile"
@@ -35,7 +35,7 @@ const Footer = () => {
           name="heart-o"
           size={24}
           color={COLORS.nope}
-          bgColor={route.name === "HomeScreen" ? "#1E1E2DE6" : "#1E1E2D40"}
+          bgColor={route.name === "HomeScreen" ? "#1E1E2DE6" : "#1E1E2D1A"}
           elev={route.name === "HomeScreen" ? 5 : null}
           handlePress={
             route.name === "HomeScreen"
@@ -49,7 +49,7 @@ const Footer = () => {
           name="commenting-o"
           size={24}
           color={COLORS.star}
-          bgColor={route.name === "Chat" ? "#1E1E2DE6" : "#1E1E2D40"}
+          bgColor={route.name === "Chat" ? "#1E1E2DE6" : "#1E1E2D1A"}
           elev={route.name === "Chat" ? 5 : null}
           handlePress={
             route.name === "Chat" ? null : () => navigation.navigate("Chat")

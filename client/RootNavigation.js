@@ -1,5 +1,5 @@
-import ScreenMenu from "./components/Menus/ScreenMenu";
-import { AuthProvider } from "./context/authContext";
+import ScreenMenu from "./src/navigation/ScreenMenu";
+import { AuthProvider } from "./src/context/authContext";
 
 const RootNavigation = () => {
   return (

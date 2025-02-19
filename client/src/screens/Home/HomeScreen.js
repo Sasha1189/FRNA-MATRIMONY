@@ -15,12 +15,12 @@ import React, {
 } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from "@react-navigation/native";
-import VideoCard from "../components/SubComp/VideoCard";
-import EmptyList from "../components/SubComp/EmptyList";
-import Footer from "../components/Menus/Footer";
 import axios from "axios";
-import { AuthContext } from "../context/authContext";
-import HeaderIcons from "../components/Menus/HeaderIcons";
+import VideoCard from "../../components/SubComp/VideoCard";
+import EmptyList from "../../components/SubComp/EmptyList";
+import Footer from "../../components/Menus/Footer";
+import { AuthContext } from "../../context/authContext";
+import HeaderIcons from "../../components/Menus/HeaderIcons";
 
 const { height, width } = Dimensions.get("window");
 const ITEM_HEIGHT = height * 0.9; // Fixed height per card

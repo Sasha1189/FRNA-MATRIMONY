@@ -1,50 +1,18 @@
-import { Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View, ActivityIndicator } from "react-native";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useEffect, useState } from "react";
 import IconButton from "../../components/SubComp/IconButton";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import ProfileDisplay from "../../components/SubComp/ProfileDisplay";
+import ProfileDisplay from "../Profile/ProfileDisplay";
 
 const COLORS = {
   like: "#00eda6",
   nope: "#ff006f",
   star: "#07A6FF",
 };
-
-const MyProfile = () => {
-  const [loading, setLoading] = useState(true);
-  const [item, setItem] = useState({
-    id: "xyz",
-    image: {},
-    profile: {},
-  });
-
-  useEffect(() => {
-    const loadAuthUserDataFromLocal = async () => {
-      try {
-        const storedBiodata = JSON.parse(
-          await AsyncStorage.getItem("storedBiodata")
-        );
-        const storedImages = JSON.parse(
-          await AsyncStorage.getItem("storedImages")
-        );
-
-        if (storedBiodata && storedImages) {
-          setLoading(false);
-          setItem({
-            id: "xyz",
-            image: { imageUrls: storedImages },
-            profile: storedBiodata,
-          });
-        }
-      } catch (error) {
-        Alert.alert("Error", "Failed to load images.");
-        console.error(error);
-      }
-    };
-    loadAuthUserDataFromLocal();
-  }, []);
-
+const DynymicUserProfile = ({ route }) => {
+  const [loading, setLoading] = useState(false);
+  const { item } = route.params;
+  if (!item) setLoading(true);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -85,8 +53,26 @@ const MyProfile = () => {
       </View>
       <View style={styles.flatListContainer}>
         {loading ? (
-          <View style={{ alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ textAlign: "center" }}>Loading Profile...</Text>
+          <View
+            style={{
+              marginTop: 100,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color="#00eda6" />
+            <Text
+              style={{
+                fontSize: 18,
+                marginTop: 50,
+                alignItems: "center",
+                fontWeight: "bold",
+                color: "#ff006f",
+                letterSpacing: 5,
+              }}
+            >
+              Loading Profile...
+            </Text>
           </View>
         ) : (
           <ProfileDisplay item={item} />
@@ -95,6 +81,7 @@ const MyProfile = () => {
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -113,4 +100,5 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 });
-export default MyProfile;
+
+export default DynymicUserProfile;

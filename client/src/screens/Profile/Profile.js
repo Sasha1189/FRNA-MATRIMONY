@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import Footer from "../components/Menus/Footer";
-import IconButton from "../components/SubComp/IconButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AuthContext } from "../context/authContext";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Footer from "../../components/Menus/Footer";
+import IconButton from "../../components/SubComp/IconButton";
+import { AuthContext } from "../../context/authContext";
 
 const COLORS = {
   like: "#00eda6",
@@ -88,7 +88,7 @@ const Profile = () => {
               />
             ) : (
               <Image
-                source={require("../assets/images/profile.png")}
+                source={require("../../assets/images/profile.png")}
                 style={styles.profileImage}
                 resizeMode="contain"
               />
@@ -109,7 +109,7 @@ const Profile = () => {
           >
             <View style={styles.iconContainer}>
               <Image
-                source={require("../assets/icons/camera.png")}
+                source={require("../../assets/icons/camera.png")}
                 style={styles.icon}
                 resizeMode="contain"
               />
@@ -123,7 +123,7 @@ const Profile = () => {
             >
               <View style={styles.iconContainer}>
                 <Image
-                  source={require("../assets/icons/usered.png")}
+                  source={require("../../assets/icons/usered.png")}
                   style={{ height: "80%", width: "80%" }}
                   resizeMode="contain"
                 />
@@ -136,7 +136,7 @@ const Profile = () => {
             >
               <View style={styles.iconContainer}>
                 <Image
-                  source={require("../assets/icons/set.png")}
+                  source={require("../../assets/icons/set.png")}
                   style={styles.icon}
                   resizeMode="contain"
                 />

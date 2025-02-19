@@ -7,9 +7,8 @@ import {
   ScrollView,
 } from "react-native";
 import Slider from "@react-native-community/slider";
-import CustomPicker from "../components/Menus/CustomPicker";
+import CustomPicker from "../../components/Menus/CustomPicker";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
 
 const maritalStatuses = ["Single", "Divorced", "Widowed"];
 const incomeOptions = ["Less than 10 Lakh", "More than 10 Lakh"];

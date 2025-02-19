@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, Alert } from "react-native";
 import React, { useState } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import InputBox from "../../components/Forms/InputBox";
-import SubmitButton from "../../components/Forms/SubmitButton";
+import InputBox from "../../components/Common/InputBox";
+import SubmitButton from "../../components/SubComp/SubmitButton";
 import axios from "axios";
 
 const genders = ["Male", "Female"];

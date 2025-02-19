@@ -9,12 +9,12 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
-import IconButton from "../../components/SubComp/IconButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
-import FormField from "../../components/Forms/FormField";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import IconButton from "../../components/SubComp/IconButton";
+import FormField from "../../components/Common/FormField";
 
 const districts = [
   "Ahmednagar",

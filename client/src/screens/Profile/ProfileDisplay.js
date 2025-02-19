@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React from "react";
-import ImageCarousal from "./ImageCarousal";
+import ImageCarousal from "../../components/SubComp/ImageCarousal";
 
 const ProfileDisplay = ({ item }) => {
   const { height, width } = Dimensions.get("window");
