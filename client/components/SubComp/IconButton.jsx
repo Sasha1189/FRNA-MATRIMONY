@@ -2,7 +2,15 @@ import { style, TouchableWithoutFeedback, Animated } from "react-native";
 import React, { useRef, useCallback } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-const IconButton = ({ name, size, color, bgColor, style, handlePress }) => {
+const IconButton = ({
+  name,
+  size,
+  color,
+  bgColor,
+  elev,
+  style,
+  handlePress,
+}) => {
   const scale = useRef(new Animated.Value(1)).current;
   const animateScale = useCallback(
     (newValue) => {
@@ -29,8 +37,8 @@ const IconButton = ({ name, size, color, bgColor, style, handlePress }) => {
         style={{
           height: 50,
           width: 50,
-          backgroundColor: bgColor ?? "#1E1E2DE6",
-          elevation: 5,
+          backgroundColor: bgColor,
+          elevation: elev,
           borderRadius: 40,
           justifyContent: "center",
           alignItems: "center",

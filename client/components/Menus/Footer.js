@@ -1,6 +1,5 @@
 import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
-import React, { useContext } from "react";
-import { AuthContext } from "../../context/authContext";
+import React from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import IconButton from "../SubComp/IconButton";
 
@@ -12,9 +11,8 @@ const COLORS = {
 };
 
 const Footer = () => {
-  const [state] = useContext(AuthContext);
   const navigation = useNavigation();
-  const route = useRoute(); // gives us the current route info
+  const route = useRoute();
 
   return (
     <View style={styles.container}>
@@ -23,7 +21,13 @@ const Footer = () => {
           name="user-o"
           size={24}
           color={COLORS.like}
-          handlePress={() => navigation.navigate("Profile")}
+          bgColor={route.name === "Profile" ? "#1E1E2DE6" : "#1E1E2D40"}
+          elev={route.name === "Profile" ? 5 : null}
+          handlePress={
+            route.name === "Profile"
+              ? null
+              : () => navigation.navigate("Profile")
+          }
         />
       </TouchableOpacity>
       <TouchableOpacity style={styles.iconContainer}>
@@ -31,7 +35,13 @@ const Footer = () => {
           name="heart-o"
           size={24}
           color={COLORS.nope}
-          handlePress={() => navigation.navigate("HomeScreen")}
+          bgColor={route.name === "HomeScreen" ? "#1E1E2DE6" : "#1E1E2D40"}
+          elev={route.name === "HomeScreen" ? 5 : null}
+          handlePress={
+            route.name === "HomeScreen"
+              ? null
+              : () => navigation.navigate("HomeScreen")
+          }
         />
       </TouchableOpacity>
       <TouchableOpacity style={styles.iconContainer}>
@@ -39,7 +49,11 @@ const Footer = () => {
           name="commenting-o"
           size={24}
           color={COLORS.star}
-          handlePress={() => navigation.navigate("Chat")}
+          bgColor={route.name === "Chat" ? "#1E1E2DE6" : "#1E1E2D40"}
+          elev={route.name === "Chat" ? 5 : null}
+          handlePress={
+            route.name === "Chat" ? null : () => navigation.navigate("Chat")
+          }
         />
       </TouchableOpacity>
     </View>

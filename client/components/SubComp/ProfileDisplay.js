@@ -8,12 +8,11 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import ImageCarousal from "./ImageCarousal";
 
 const ProfileDisplay = ({ item }) => {
   const { height, width } = Dimensions.get("window");
-  const containerHeight = height * 0.8; // Ensure user is defined before using it
+  const containerHeight = height * 0.8;
   if (!item) {
     return (
       <SafeAreaView style={styles.container}>
@@ -26,8 +25,8 @@ const ProfileDisplay = ({ item }) => {
   const Biodata = item?.profile;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollViewContainer}>
+    <View style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={[styles.sectionImage, { height: containerHeight }]}>
           <ImageCarousal id={item._id} images={item?.image} />
         </View>
@@ -88,18 +87,14 @@ const ProfileDisplay = ({ item }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
-  },
-  listContainer: {
-    borderWidth: 1,
-    borderColor: "red",
+    backgroundColor: "#f2f2f2",
   },
   sectionImage: {
     flex: 1,
@@ -109,13 +104,12 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   sectionBiodata: {
-    borderWidth: 2,
+    borderWidth: 0.5,
     borderColor: "#333333",
     marginTop: 16,
     marginBottom: 16,
-    padding: 16,
+    padding: 20,
     paddingBottom: 0,
-    backgroundColor: "#1E1E2C", // Replace with your black-100 equivalent
     borderRadius: 16,
   },
   sectionTitle: {
@@ -124,7 +118,7 @@ const styles = StyleSheet.create({
     color: "#AAAAAA", // Replace with your gray-100 equivalent
   },
   button: {
-    borderWidth: 2,
+    borderWidth: 0.5,
     borderColor: "#444444", // Replace with your secondary color
     height: 48,
     marginBottom: 16,
@@ -135,16 +129,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   buttonText: {
-    color: "#FFFFFF",
+    // color: "#FFFFFF",
     textAlign: "center",
   },
   sectionDanger: {
-    borderWidth: 2,
+    borderWidth: 0.5,
     borderColor: "#333333",
     marginBottom: 100,
     padding: 16,
     paddingBottom: 0,
-    backgroundColor: "#1E1E2C", // Replace with your black-100 equivalent
+    // backgroundColor: "#1E1E2C",
     borderRadius: 16,
   },
 });

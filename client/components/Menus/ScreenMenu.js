@@ -71,7 +71,7 @@ const ScreenMenu = () => {
             name="Profile"
             component={Profile}
             options={{
-              headerShown: true,
+              headerShown: false,
             }}
           />
           <Stack.Screen
@@ -85,21 +85,21 @@ const ScreenMenu = () => {
             name="AddImages"
             component={AddImages}
             options={{
-              headerShown: true,
+              headerShown: false,
             }}
           />
           <Stack.Screen
             name="Biodata"
             component={Biodata}
             options={{
-              headerShown: true,
+              headerShown: false,
             }}
           />
           <Stack.Screen
             name="Setting"
             component={Setting}
             options={{
-              headerShown: true,
+              headerShown: false,
             }}
           />
         </>

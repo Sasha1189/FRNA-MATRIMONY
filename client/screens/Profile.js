@@ -3,8 +3,15 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Footer from "../components/Menus/Footer";
+import IconButton from "../components/SubComp/IconButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/authContext";
+
+const COLORS = {
+  like: "#00eda6",
+  nope: "#ff006f",
+  star: "#07A6FF",
+};
 
 const Profile = () => {
   const [state] = useContext(AuthContext);
@@ -29,6 +36,41 @@ const Profile = () => {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text style={{ height: 50, width: 50 }}></Text>
+          <Text
+            style={{
+              fontSize: 18,
+              alignItems: "center",
+              fontWeight: "bold",
+              fontStyle: "",
+              color: "#ff006f",
+              letterSpacing: 2,
+            }}
+          >
+            PROFILE
+          </Text>
+          <IconButton
+            name="arrow-right"
+            size={24}
+            color={COLORS.star}
+            bgColor={"transparent"}
+            style={{
+              elevation: 0,
+              height: 50,
+              width: 50,
+              borderWidth: 0,
+            }}
+          />
+        </View>
+      </View>
       <View style={styles.mainContent}>
         {/* Profile Section */}
         <TouchableOpacity
@@ -56,6 +98,7 @@ const Profile = () => {
             {state?.user?.name
               ?.toLowerCase()
               .replace(/\b\w/g, (char) => char.toUpperCase())}
+            , 23
           </Text>
         </TouchableOpacity>
         {/* Buttons Section */}
@@ -81,7 +124,7 @@ const Profile = () => {
               <View style={styles.iconContainer}>
                 <Image
                   source={require("../assets/icons/usered.png")}
-                  style={styles.icon}
+                  style={{ height: "80%", width: "80%" }}
                   resizeMode="contain"
                 />
               </View>
@@ -113,8 +156,7 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* Footer Section */}
-      <View style={styles.footerSection}>
+      <View style={styles.footer}>
         <Footer />
       </View>
     </SafeAreaView>
@@ -124,10 +166,20 @@ const Profile = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1E1E2C", // Dark background for a modern look
+    backgroundColor: "#f2f2f2",
+    // backgroundColor: "#1E1E2C", // Dark background for a modern look
+  },
+  header: {
+    justifyContent: "flex-start",
+    padding: 2,
+    borderBottomWidth: 0.5,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
   },
   mainContent: {
-    flex: 1, // Ensures main content takes all available space above the footer
+    flex: 1,
+    margin: 5,
+    // borderWidth: 1,
   },
   profileSection: {
     justifyContent: "center",
@@ -135,14 +187,14 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   profileImageContainer: {
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     marginBottom: 15,
-    borderRadius: 75,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#3C3C4E",
-    borderWidth: 2,
+    borderWidth: 0.5,
     borderColor: "#A6A6C1",
     overflow: "hidden",
   },
@@ -151,9 +203,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   profileName: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#FFFFFF",
+    // color: "#FFFFFF",
     textAlign: "center",
   },
   buttonsSection: {
@@ -168,12 +220,12 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 60,
     height: 60,
-    borderWidth: 2,
+    borderWidth: 0.2,
     borderColor: "#333333",
     borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#3C3C4E",
+    // backgroundColor: "#3C3C4E",
     overflow: "hidden",
   },
   icon: {
@@ -183,7 +235,7 @@ const styles = StyleSheet.create({
   buttonText: {
     marginTop: 8,
     fontSize: 14,
-    color: "#FFFFFF",
+    // color: "#FFFFFF",
     textAlign: "center",
   },
   horizontalButtons: {
@@ -200,21 +252,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   subscribeButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 100,
-    backgroundColor: "#FF8C42",
-    borderRadius: 30,
-    borderWidth: 2,
+    backgroundColor: "#FF8C42", // Replace with your desired color
+    padding: 12,
+    width: "80%",
+    marginHorizontal: "10%",
+    marginBottom: 10,
+    borderRadius: 16,
+    alignItems: "center",
   },
   subscribeText: {
-    fontSize: 18,
-    fontWeight: "bold",
     color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
     textAlign: "center",
+    letterSpacing: 0.5,
   },
-  footerSection: {
-    alignItems: "center",
+  footer: {
     justifyContent: "flex-end",
+    padding: 2,
+    borderTopWidth: 0.5,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
   },
 });
 

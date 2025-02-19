@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
+import IconButton from "../../components/SubComp/IconButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import FormField from "../../components/Forms/FormField";
@@ -55,7 +56,11 @@ const districts = [
 ];
 const maritalStatuses = ["Single", "Divorced", "Widowed"];
 const incomeOptions = ["Less than 10 Lakh", "More than 10 Lakh"];
-
+const COLORS = {
+  like: "#00eda6",
+  nope: "#ff006f",
+  star: "#07A6FF",
+};
 const Biodata = () => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -165,270 +170,331 @@ const Biodata = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <ScrollView contentContainerStyle={styles.scrollView}>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Update your biodata here...</Text>
-          </View>
-          {[
-            {
-              title: "Full Name",
-              value: "fullname",
-              placeholder: "Write your full name...",
-            },
-            {
-              title: "About me",
-              value: "aboutme",
-              placeholder: "Write about yourself...",
-              multiline: true,
-            },
-            {
-              title: "Education",
-              value: "education",
-              placeholder: "Write your highest education..",
-            },
-            {
-              title: "Work",
-              value: "work",
-              placeholder: "Company of your work..",
-            },
-            {
-              title: "Height",
-              value: "height",
-              placeholder: "Enter your height (e.g., 5'7\")",
-            },
-            {
-              title: "Hobby",
-              value: "hobies",
-              placeholder: "Write your hobbies",
-            },
-          ].map((field, index) => (
-            <View key={index} style={styles.fieldContainer}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <IconButton
+            name="arrow-left"
+            size={24}
+            color={COLORS.star}
+            bgColor={"transparent"}
+            style={{
+              elevation: 0,
+              height: 50,
+              width: 50,
+              borderWidth: 0,
+            }}
+          />
+
+          <Text
+            style={{
+              fontSize: 18,
+              alignItems: "center",
+              fontWeight: "bold",
+              fontStyle: "",
+              color: "#ff006f",
+              letterSpacing: 2,
+            }}
+          >
+            BIODATA
+          </Text>
+          <Text style={{ height: 50, width: 50 }}></Text>
+        </View>
+      </View>
+      <View style={styles.flatListContainer}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <ScrollView contentContainerStyle={styles.scrollView}>
+            <View style={styles.contentHeader}>
+              <Text style={styles.contentHeaderText}>
+                Update your biodata here...
+              </Text>
+            </View>
+            {[
+              {
+                title: "Full Name",
+                value: "fullname",
+                placeholder: "Write your full name...",
+              },
+              {
+                title: "About me",
+                value: "aboutme",
+                placeholder: "Write about yourself...",
+                multiline: true,
+              },
+              {
+                title: "Education",
+                value: "education",
+                placeholder: "Write your highest education..",
+              },
+              {
+                title: "Work",
+                value: "work",
+                placeholder: "Company of your work..",
+              },
+              {
+                title: "Height",
+                value: "height",
+                placeholder: "Enter your height (e.g., 5'7\")",
+              },
+              {
+                title: "Hobby",
+                value: "hobies",
+                placeholder: "Write your hobbies",
+              },
+            ].map((field, index) => (
+              <View key={index} style={styles.fieldContainer}>
+                <FormField
+                  title={field.title}
+                  value={form[field.value]}
+                  placeholder={field.placeholder}
+                  multiline={field.multiline || false}
+                  otherStyles={field.multiline ? { height: 100 } : undefined}
+                  handleChangeText={(value) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      [field.value]: value,
+                    }))
+                  }
+                />
+              </View>
+            ))}
+
+            {/* Income Dropdown */}
+            <View style={styles.fieldContainer}>
+              <Text style={styles.title}>Income</Text>
+              <View style={styles.dropdownContainer}>
+                <Picker
+                  selectedValue={form.income}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, income: value }))
+                  }
+                  style={styles.picker}
+                  dropdownIconColor="#808080"
+                >
+                  <Picker.Item
+                    label="Select income"
+                    value=""
+                    style={styles.placeholderLabel}
+                  />
+                  {incomeOptions.map((option) => (
+                    <Picker.Item key={option} label={option} value={option} />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            {/* Lives in Dropdown */}
+            <View style={styles.fieldContainer}>
+              <Text style={styles.title}>Current City</Text>
+              <View style={styles.dropdownContainer}>
+                <Picker
+                  selectedValue={form.livesin}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, livesin: value }))
+                  }
+                  style={styles.picker}
+                  dropdownIconColor="#808080"
+                >
+                  <Picker.Item
+                    label="Select a district"
+                    value=""
+                    style={styles.placeholderLabel}
+                  />
+                  {districts.map((district) => (
+                    <Picker.Item
+                      key={district}
+                      label={district}
+                      value={district}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            {/* Hometown Dropdown */}
+            <View style={styles.fieldContainer}>
+              <Text style={styles.title}>Hometown</Text>
+              <View style={styles.dropdownContainer}>
+                <Picker
+                  selectedValue={form.hometown}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, hometown: value }))
+                  }
+                  style={styles.picker}
+                  dropdownIconColor="#808080"
+                >
+                  <Picker.Item
+                    label="Select a district"
+                    value=""
+                    style={styles.placeholderLabel}
+                  />
+                  {districts.map((district) => (
+                    <Picker.Item
+                      key={district}
+                      label={district}
+                      value={district}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            {/* Marital Status Dropdown */}
+            <View style={styles.fieldContainer}>
+              <Text style={styles.title}>Marital Status</Text>
+              <View style={styles.dropdownContainer}>
+                <Picker
+                  selectedValue={form.maritalStatus}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, maritalStatus: value }))
+                  }
+                  style={styles.picker}
+                  dropdownIconColor="#808080"
+                >
+                  <Picker.Item
+                    label="Select marital status"
+                    value=""
+                    style={styles.placeholderLabel}
+                  />
+                  {maritalStatuses.map((status) => (
+                    <Picker.Item key={status} label={status} value={status} />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            {/* Family Details */}
+            <View style={styles.fieldContainer}>
               <FormField
-                title={field.title}
-                value={form[field.value]}
-                placeholder={field.placeholder}
-                multiline={field.multiline || false}
-                otherStyles={field.multiline ? { height: 100 } : undefined}
+                title="Family Details"
+                value={form.familyDetails}
+                placeholder="Describe your family details (e.g. family members, family size, occupations, etc.)"
                 handleChangeText={(value) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    [field.value]: value,
-                  }))
+                  setForm((prev) => ({ ...prev, familyDetails: value }))
                 }
+                otherStyles={{ height: 100, textAlignVertical: "top" }}
+                multiline={true}
               />
             </View>
-          ))}
 
-          {/* Income Dropdown */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.title}>Income</Text>
-            <View style={styles.dropdownContainer}>
-              <Picker
-                selectedValue={form.income}
-                onValueChange={(value) =>
-                  setForm((prev) => ({ ...prev, income: value }))
+            {/* Partner Expectations */}
+            <View style={styles.fieldContainer}>
+              <FormField
+                title="Partner Expectations"
+                value={form.partnerExpectations}
+                placeholder="Write about your expectations for your partner"
+                handleChangeText={(value) =>
+                  setForm((prev) => ({ ...prev, partnerExpectations: value }))
                 }
-                style={styles.picker}
-                dropdownIconColor="#808080"
-              >
-                <Picker.Item
-                  label="Select income"
-                  value=""
-                  style={styles.placeholderLabel}
-                />
-                {incomeOptions.map((option) => (
-                  <Picker.Item key={option} label={option} value={option} />
-                ))}
-              </Picker>
+                otherStyles={{ height: 100, textAlignVertical: "top" }}
+                multiline={true}
+              />
             </View>
-          </View>
-
-          {/* Lives in Dropdown */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.title}>Current City</Text>
-            <View style={styles.dropdownContainer}>
-              <Picker
-                selectedValue={form.livesin}
-                onValueChange={(value) =>
-                  setForm((prev) => ({ ...prev, livesin: value }))
-                }
-                style={styles.picker}
-                dropdownIconColor="#808080"
-              >
-                <Picker.Item
-                  label="Select a district"
-                  value=""
-                  style={styles.placeholderLabel}
-                />
-                {districts.map((district) => (
-                  <Picker.Item
-                    key={district}
-                    label={district}
-                    value={district}
-                  />
-                ))}
-              </Picker>
-            </View>
-          </View>
-
-          {/* Hometown Dropdown */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.title}>Hometown</Text>
-            <View style={styles.dropdownContainer}>
-              <Picker
-                selectedValue={form.hometown}
-                onValueChange={(value) =>
-                  setForm((prev) => ({ ...prev, hometown: value }))
-                }
-                style={styles.picker}
-                dropdownIconColor="#808080"
-              >
-                <Picker.Item
-                  label="Select a district"
-                  value=""
-                  style={styles.placeholderLabel}
-                />
-                {districts.map((district) => (
-                  <Picker.Item
-                    key={district}
-                    label={district}
-                    value={district}
-                  />
-                ))}
-              </Picker>
-            </View>
-          </View>
-
-          {/* Marital Status Dropdown */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.title}>Marital Status</Text>
-            <View style={styles.dropdownContainer}>
-              <Picker
-                selectedValue={form.maritalStatus}
-                onValueChange={(value) =>
-                  setForm((prev) => ({ ...prev, maritalStatus: value }))
-                }
-                style={styles.picker}
-                dropdownIconColor="#808080"
-              >
-                <Picker.Item
-                  label="Select marital status"
-                  value=""
-                  style={styles.placeholderLabel}
-                />
-                {maritalStatuses.map((status) => (
-                  <Picker.Item key={status} label={status} value={status} />
-                ))}
-              </Picker>
-            </View>
-          </View>
-
-          {/* Family Details */}
-          <View style={styles.fieldContainer}>
-            <FormField
-              title="Family Details"
-              value={form.familyDetails}
-              placeholder="Describe your family details (e.g. family members, family size, occupations, etc.)"
-              handleChangeText={(value) =>
-                setForm((prev) => ({ ...prev, familyDetails: value }))
-              }
-              otherStyles={{ height: 100, textAlignVertical: "top" }}
-              multiline={true}
-            />
-          </View>
-
-          {/* Partner Expectations */}
-          <View style={styles.fieldContainer}>
-            <FormField
-              title="Partner Expectations"
-              value={form.partnerExpectations}
-              placeholder="Write about your expectations for your partner"
-              handleChangeText={(value) =>
-                setForm((prev) => ({ ...prev, partnerExpectations: value }))
-              }
-              otherStyles={{ height: 100, textAlignVertical: "top" }}
-              multiline={true}
-            />
-          </View>
-          <TouchableOpacity
-            onPress={submit}
-            style={[styles.publishBtn, loading && { opacity: 0.6 }]}
-            disabled={loading}
-          >
-            <Text style={styles.publishBtnText}>
-              {loading ? "Updating..." : "UPDATE"}
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
+      <View style={styles.footer}>
+        <TouchableOpacity
+          onPress={submit}
+          style={[styles.publishBtn, loading && { opacity: 0.6 }]}
+          disabled={loading}
+        >
+          <Text style={styles.publishBtnText}>
+            {loading ? "Updating..." : "UPDATE"}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: "#1E1E2C",
+    backgroundColor: "#f2f2f2",
+  },
+  header: {
+    justifyContent: "flex-start",
+    padding: 2,
+    borderBottomWidth: 0.5,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
+  },
+  flatListContainer: {
+    flex: 1,
+    margin: 5,
+    overflow: "hidden",
+    // borderWidth: 1,
   },
   scrollView: {
     marginHorizontal: 16,
     paddingVertical: 24,
   },
-  header: {
+  contentHeader: {
     marginBottom: 16,
   },
-  headerText: {
+  contentHeaderText: {
     fontSize: 18,
     fontWeight: "medium",
-    color: "#FFFFFF",
+    // color: "#FFFFFF",
     textAlign: "left",
   },
   fieldContainer: {
     marginBottom: 16,
     padding: 16,
-    borderWidth: 2,
+    borderWidth: 0.5,
     borderColor: "#333333",
     borderRadius: 16,
   },
   title: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#FFFFFF",
+    // color: "#FFFFFF",
     marginBottom: 8,
   },
   dropdownContainer: {
-    backgroundColor: "#2E2E40",
+    // backgroundColor: "#2E2E40",
+    backgroundColor: "#fff",
     borderRadius: 8,
     overflow: "hidden",
   },
   picker: {
-    color: "#FFFFFF", // Label color for selected value
+    // color: "#FFFFFF", // Label color for selected value
     fontSize: 16,
     height: 50,
     width: "100%",
   },
   placeholderLabel: {
-    color: "#888888", // Light gray for the placeholder
+    // color: "#888888", // Light gray for the placeholder
     fontSize: 14,
   },
   publishBtn: {
     backgroundColor: "#FF8C42", // Replace with your desired color
-    padding: 12,
+    padding: 10,
     width: "80%",
     marginHorizontal: "10%",
-    marginBottom: 50,
+    marginVertical: 8,
     borderRadius: 16,
     alignItems: "center",
   },
   publishBtnText: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
+    letterSpacing: 0.5,
+  },
+  footer: {
+    justifyContent: "flex-end",
+    backgroundColor: "#fff",
   },
 });
 

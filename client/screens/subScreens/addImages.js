@@ -10,10 +10,16 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
+import IconButton from "../../components/SubComp/IconButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const MAX_IMAGES = 4;
+const COLORS = {
+  like: "#00eda6",
+  nope: "#ff006f",
+  star: "#07A6FF",
+};
 
 const AddImages = () => {
   const [images, setImages] = useState([]);
@@ -105,63 +111,116 @@ const AddImages = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Add your profile photos here...</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <IconButton
+            name="arrow-left"
+            size={24}
+            color={COLORS.star}
+            bgColor={"transparent"}
+            style={{
+              elevation: 0,
+              height: 50,
+              width: 50,
+              borderWidth: 0,
+            }}
+          />
+
+          <Text
+            style={{
+              fontSize: 18,
+              alignItems: "center",
+              fontWeight: "bold",
+              fontStyle: "",
+              color: "#ff006f",
+              letterSpacing: 2,
+            }}
+          >
+            ADD IMAGES
+          </Text>
+          <Text style={{ height: 50, width: 50 }}></Text>
+        </View>
       </View>
-      <View style={styles.container}>
-        {Array.from({ length: MAX_IMAGES }).map((_, index) => (
-          <View key={index} style={styles.imageWrapper}>
-            {images[index] ? (
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: images[index] }}
-                  style={styles.thumbnailImage}
-                  resizeMode="cover"
-                />
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => removeImage(index)}
-                >
-                  <Text style={styles.removeButtonText}>X</Text>
+      <View style={styles.flatListContainer}>
+        <View style={styles.contentHeaderName}>
+          <Text style={styles.contentHeaderText}>
+            Add your profile photos here...
+          </Text>
+        </View>
+        <View style={styles.contentContainer}>
+          {Array.from({ length: MAX_IMAGES }).map((_, index) => (
+            <View key={index} style={styles.imageWrapper}>
+              {images[index] ? (
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{ uri: images[index] }}
+                    style={styles.thumbnailImage}
+                    resizeMode="cover"
+                  />
+                  <TouchableOpacity
+                    style={styles.removeButton}
+                    onPress={() => removeImage(index)}
+                  >
+                    <Text style={styles.removeButtonText}>X</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity onPress={openPicker} style={styles.addImage}>
+                  <Image
+                    source={require("../../assets/icons/upload.png")}
+                    style={styles.uploadIcon}
+                  />
+                  <Text style={styles.uploadText}>Choose a file</Text>
                 </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity onPress={openPicker} style={styles.addImage}>
-                <Image
-                  source={require("../../assets/icons/upload.png")}
-                  style={styles.uploadIcon}
-                />
-                <Text style={styles.uploadText}>Choose a file</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        ))}
+              )}
+            </View>
+          ))}
+        </View>
+        <TouchableOpacity onPress={Upload} style={styles.uploadButton}>
+          <Text style={styles.uploadButtonText}>Upload Images</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={Upload} style={styles.uploadButton}>
-        <Text style={styles.uploadButtonText}>Upload Images</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: "#1E1E2C", // Replace with your primary color
+    backgroundColor: "#f2f2f2",
   },
   header: {
+    justifyContent: "flex-start",
+    padding: 2,
+    borderBottomWidth: 0.5,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
+  },
+  flatListContainer: {
+    flex: 1,
+    borderRadius: 10,
+    margin: 5,
+    overflow: "hidden",
+    // borderWidth: 1,
+  },
+  contentHeaderName: {
     paddingHorizontal: 16,
     marginVertical: 24,
   },
-  headerText: {
+  contentHeaderText: {
     fontSize: 16,
-    fontWeight: "600", // 'font-psemibold' equivalent
-    color: "#FFFFFF",
+    fontWeight: "600",
     marginLeft: 20,
     // textAlign: "center",
   },
-  container: {
+  contentContainer: {
     flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",

@@ -30,12 +30,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#FFFFFF", // Default title color
+    // color: "#FFFFFF", // Default title color
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "#2E2E40",
-    color: "#FFFFFF",
+    // backgroundColor: "#2E2E40",
+    // color: "#FFFFFF",
+    backgroundColor: "#fff",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
