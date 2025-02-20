@@ -183,9 +183,9 @@ const ChatListScreen = ({ navigation }) => {
           )}
         />
       </View>
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <Footer />
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 };

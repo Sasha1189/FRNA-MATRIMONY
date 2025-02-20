@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import IconButton from "../../components/SubComp/IconButton";
 import ProfileDisplay from "./ProfileDisplay";
+import { useNavigation } from "@react-navigation/native";
 
 const COLORS = {
   like: "#00eda6",
@@ -19,7 +20,13 @@ const MyProfile = () => {
     profile: {},
   });
 
+  const navigation = useNavigation();
+
   useEffect(() => {
+    navigation.getParent()?.setOptions({
+      tabBarStyle: { display: "none" },
+    });
+
     const loadAuthUserDataFromLocal = async () => {
       try {
         const storedBiodata = JSON.parse(
@@ -43,7 +50,12 @@ const MyProfile = () => {
       }
     };
     loadAuthUserDataFromLocal();
-  }, []);
+    return () => {
+      navigation.getParent()?.setOptions({
+        tabBarStyle: undefined, // or your default style
+      });
+    };
+  }, [navigation]);
 
   return (
     <SafeAreaView style={styles.container}>

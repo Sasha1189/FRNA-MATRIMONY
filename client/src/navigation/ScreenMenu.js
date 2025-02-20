@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import { NavigationContainer } from "@react-navigation/native";
 import AuthStack from "./AuthStack";
+import TabNavigator from "./TabNavigator";
 import MainStack from "./MainStack";
 
 const ScreenMenu = () => {
@@ -10,7 +11,7 @@ const ScreenMenu = () => {
 
   return (
     <NavigationContainer>
-      {authenticatedUser ? <MainStack /> : <AuthStack />}
+      {authenticatedUser ? <TabNavigator /> : <AuthStack />}
     </NavigationContainer>
   );
 };

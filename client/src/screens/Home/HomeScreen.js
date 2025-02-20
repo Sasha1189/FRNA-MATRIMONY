@@ -14,7 +14,7 @@ import React, {
   useRef,
 } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useNavigationState } from "@react-navigation/native";
 import axios from "axios";
 import VideoCard from "../../components/SubComp/VideoCard";
 import EmptyList from "../../components/SubComp/EmptyList";
@@ -27,6 +27,9 @@ const ITEM_HEIGHT = height * 0.9; // Fixed height per card
 
 const HomeScreen = () => {
   const route = useRoute();
+  const state1 = useNavigationState((state) => state);
+  const screenCount = state1?.routes?.length ?? 0;
+  console.log(screenCount);
 
   // If filterParams is undefined or null, we fetch all profiles
   const filterParams = route.params?.filterParams || null;
@@ -119,9 +122,9 @@ const HomeScreen = () => {
           windowSize={5}
         />
       </View>
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <Footer />
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 };

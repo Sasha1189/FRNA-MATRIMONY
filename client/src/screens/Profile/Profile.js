@@ -156,9 +156,9 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <Footer />
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 };

@@ -38,9 +38,7 @@ const Footer = () => {
           bgColor={route.name === "HomeScreen" ? "#1E1E2DE6" : "#1E1E2D1A"}
           elev={route.name === "HomeScreen" ? 5 : null}
           handlePress={
-            route.name === "HomeScreen"
-              ? null
-              : () => navigation.navigate("HomeScreen")
+            route.name === "HomeScreen" ? null : () => navigation.popToTop()
           }
         />
       </TouchableOpacity>
