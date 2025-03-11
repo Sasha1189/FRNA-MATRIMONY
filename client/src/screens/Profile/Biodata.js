@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import {
   View,
   Text,
@@ -13,8 +13,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+
 import IconButton from "../../components/SubComp/IconButton";
 import FormField from "../../components/Common/FormField";
+import { ThemeContext } from "../../context/ThemeContext"; // <--- import your ThemeContext
 
 const districts = [
   "Ahmednagar",
@@ -56,11 +58,13 @@ const districts = [
 ];
 const maritalStatuses = ["Single", "Divorced", "Widowed"];
 const incomeOptions = ["Less than 10 Lakh", "More than 10 Lakh"];
+
 const COLORS = {
   like: "#00eda6",
   nope: "#ff006f",
   star: "#07A6FF",
 };
+
 const Biodata = () => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -77,45 +81,46 @@ const Biodata = () => {
     familyDetails: "",
     partnerExpectations: "",
   });
-  //for data filter
-  const filterProfileData = (profileData) => {
-    return {
-      fullname: profileData.fullname || "",
-      aboutme: profileData.aboutme || "",
-      education: profileData.education || "",
-      work: profileData.work || "",
-      height: profileData.height || "",
-      livesin: profileData.livesin || "",
-      hometown: profileData.hometown || "",
-      income: profileData.income || "",
-      hobbies: profileData.hobbies || [], // Ensure hobbies is an array
-      maritalStatus: profileData.maritalStatus || "",
-      familyDetails: profileData.familyDetails || "",
-      partnerExpectations: profileData.partnerExpectations || "",
-    };
-  };
-  //Load initial local stored biodata if not server
+
+  // 1) Get the theme from context
+  const { theme } = useContext(ThemeContext);
+
+  // 2) Create a dynamic StyleSheet that depends on `theme`
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
+  // Utility to filter data
+  const filterProfileData = (profileData) => ({
+    fullname: profileData.fullname || "",
+    aboutme: profileData.aboutme || "",
+    education: profileData.education || "",
+    work: profileData.work || "",
+    height: profileData.height || "",
+    livesin: profileData.livesin || "",
+    hometown: profileData.hometown || "",
+    income: profileData.income || "",
+    hobbies: profileData.hobbies || [],
+    maritalStatus: profileData.maritalStatus || "",
+    familyDetails: profileData.familyDetails || "",
+    partnerExpectations: profileData.partnerExpectations || "",
+  });
+
+  // Load local or server biodata
   useEffect(() => {
     const loadBiodata = async () => {
       try {
         const storedBiodata = await AsyncStorage.getItem("storedBiodata");
-
         if (storedBiodata) {
           const parsedData = JSON.parse(storedBiodata);
-          // Ensure the data is valid before setting state
           if (parsedData && parsedData._id) {
             setForm(filterProfileData(parsedData));
-            return; // Exit to prevent unnecessary server call
+            return;
           }
         }
         // If no valid local data, fetch from server
         const { data } = await axios.get("/profile/myprofile");
-
         if (data?.currentUserProfile) {
           const filteredProfile = filterProfileData(data.currentUserProfile);
           setForm(filteredProfile);
-
-          // Store fetched data in AsyncStorage for next time
           await AsyncStorage.setItem(
             "storedBiodata",
             JSON.stringify(filteredProfile)
@@ -125,7 +130,6 @@ const Biodata = () => {
         console.error("Error loading biodata:", error);
       }
     };
-
     loadBiodata();
   }, []);
 
@@ -140,12 +144,12 @@ const Biodata = () => {
     }
     return true;
   };
+
   const saveBiodataToLocal = async () => {
     setLoading(true);
     try {
       await AsyncStorage.setItem("storedBiodata", JSON.stringify(form));
     } catch (error) {
-      setLoading(false);
       console.error(error);
     } finally {
       setLoading(false);
@@ -156,7 +160,6 @@ const Biodata = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      setLoading(true);
       const { data } = await axios.post("/profile/updateProfile", form);
       setForm(data);
       await saveBiodataToLocal();
@@ -171,43 +174,24 @@ const Biodata = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <View style={styles.headerRow}>
           <IconButton
             name="arrow-left"
             size={24}
             color={COLORS.star}
             bgColor={"transparent"}
-            style={{
-              elevation: 0,
-              height: 50,
-              width: 50,
-              borderWidth: 0,
-            }}
+            style={{ elevation: 0, height: 50, width: 50, borderWidth: 0 }}
           />
 
-          <Text
-            style={{
-              fontSize: 18,
-              alignItems: "center",
-              fontWeight: "bold",
-              fontStyle: "",
-              color: "#ff006f",
-              letterSpacing: 2,
-            }}
-          >
-            BIODATA
-          </Text>
-          <Text style={{ height: 50, width: 50 }}></Text>
+          <Text style={styles.headerTitle}>BIODATA</Text>
+          <Text style={{ height: 50, width: 50 }} />
         </View>
       </View>
-      <View style={styles.flatListContainer}>
+
+      {/* Main Content */}
+      <View style={styles.contentContainer}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -218,6 +202,8 @@ const Biodata = () => {
                 Update your biodata here...
               </Text>
             </View>
+
+            {/* Text Fields */}
             {[
               {
                 title: "Full Name",
@@ -286,7 +272,12 @@ const Biodata = () => {
                     style={styles.placeholderLabel}
                   />
                   {incomeOptions.map((option) => (
-                    <Picker.Item key={option} label={option} value={option} />
+                    <Picker.Item
+                      key={option}
+                      label={option}
+                      value={option}
+                      style={styles.placeholderLabel}
+                    />
                   ))}
                 </Picker>
               </View>
@@ -314,6 +305,7 @@ const Biodata = () => {
                       key={district}
                       label={district}
                       value={district}
+                      style={styles.placeholderLabel}
                     />
                   ))}
                 </Picker>
@@ -342,6 +334,7 @@ const Biodata = () => {
                       key={district}
                       label={district}
                       value={district}
+                      style={styles.placeholderLabel}
                     />
                   ))}
                 </Picker>
@@ -366,7 +359,12 @@ const Biodata = () => {
                     style={styles.placeholderLabel}
                   />
                   {maritalStatuses.map((status) => (
-                    <Picker.Item key={status} label={status} value={status} />
+                    <Picker.Item
+                      key={status}
+                      label={status}
+                      value={status}
+                      style={styles.placeholderLabel}
+                    />
                   ))}
                 </Picker>
               </View>
@@ -402,6 +400,8 @@ const Biodata = () => {
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
+
+      {/* Footer */}
       <View style={styles.footer}>
         <TouchableOpacity
           onPress={submit}
@@ -417,85 +417,97 @@ const Biodata = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f2f2f2",
-  },
-  header: {
-    justifyContent: "flex-start",
-    padding: 2,
-    borderBottomWidth: 0.5,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-  },
-  flatListContainer: {
-    flex: 1,
-    margin: 5,
-    overflow: "hidden",
-    // borderWidth: 1,
-  },
-  scrollView: {
-    marginHorizontal: 16,
-    paddingVertical: 24,
-  },
-  contentHeader: {
-    marginBottom: 16,
-  },
-  contentHeaderText: {
-    fontSize: 18,
-    fontWeight: "medium",
-    // color: "#FFFFFF",
-    textAlign: "left",
-  },
-  fieldContainer: {
-    marginBottom: 16,
-    padding: 16,
-    borderWidth: 0.5,
-    borderColor: "#333333",
-    borderRadius: 16,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    // color: "#FFFFFF",
-    marginBottom: 8,
-  },
-  dropdownContainer: {
-    // backgroundColor: "#2E2E40",
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  picker: {
-    // color: "#FFFFFF", // Label color for selected value
-    fontSize: 16,
-    height: 50,
-    width: "100%",
-  },
-  placeholderLabel: {
-    // color: "#888888", // Light gray for the placeholder
-    fontSize: 14,
-  },
-  publishBtn: {
-    backgroundColor: "#FF8C42", // Replace with your desired color
-    padding: 10,
-    width: "80%",
-    marginHorizontal: "10%",
-    marginVertical: 8,
-    borderRadius: 16,
-    alignItems: "center",
-  },
-  publishBtnText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-    letterSpacing: 0.5,
-  },
-  footer: {
-    justifyContent: "flex-end",
-    backgroundColor: "#fff",
-  },
-});
-
 export default Biodata;
+
+// 3) The dynamic style generator
+function createStyles(theme) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background, // from theme
+    },
+    header: {
+      justifyContent: "flex-start",
+      padding: 2,
+      borderBottomWidth: 0.5,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.secondaryBackground, // from theme
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      letterSpacing: 2,
+      color: theme.colors.primary, // e.g. highlight color
+    },
+    contentContainer: {
+      flex: 1,
+      margin: 5,
+      overflow: "hidden",
+    },
+    scrollView: {
+      marginHorizontal: 16,
+      paddingVertical: 24,
+    },
+    contentHeader: {
+      marginBottom: 16,
+    },
+    contentHeaderText: {
+      fontSize: 18,
+      textAlign: "left",
+      color: theme.colors.text, // from theme
+    },
+    fieldContainer: {
+      marginBottom: 16,
+      padding: 16,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: "600",
+      marginBottom: 8,
+      color: theme.colors.text,
+    },
+    dropdownContainer: {
+      color: theme.colors.text,
+      backgroundColor: theme.colors.secondaryBackground,
+      borderRadius: 8,
+      overflow: "hidden",
+      borderWidth: 1,
+    },
+    picker: {
+      fontSize: 16,
+      height: 50,
+      width: "100%",
+      backgroundColor: theme.colors.secondaryBackground,
+      color: theme.colors.text,
+    },
+    placeholderLabel: {
+      fontSize: 14,
+      color: theme.colors.text,
+      backgroundColor: theme.colors.secondaryBackground,
+    },
+    footer: {
+      justifyContent: "flex-end",
+      backgroundColor: theme.colors.secondaryBackground,
+    },
+    publishBtn: {
+      backgroundColor: theme.colors.primary, //if you prefer
+      padding: 10,
+      width: "80%",
+      marginHorizontal: "10%",
+      marginVertical: 8,
+      borderRadius: 16,
+      alignItems: "center",
+    },
+    publishBtnText: {
+      color: theme.colors.text,
+      fontSize: 16,
+      fontWeight: "600",
+      letterSpacing: 0.5,
+    },
+  });
+}

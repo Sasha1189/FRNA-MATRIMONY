@@ -1,17 +1,20 @@
+import React, { useContext, useMemo, useState } from "react";
 import {
   View,
   Text,
+  Switch,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useContext } from "react";
 import IconButton from "../../components/SubComp/IconButton";
 import { AuthContext } from "../../context/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import { ThemeContext } from "../../context/ThemeContext";
+import { LightTheme, DarkTheme } from "../../themes";
 
 const COLORS = {
   like: "#00eda6",
@@ -21,62 +24,70 @@ const COLORS = {
 
 const Setting = () => {
   const [state, setState] = useContext(AuthContext);
+  const [isEnabled, setIsEnabled] = useState(false);
+  const { theme, setTheme } = useContext(ThemeContext);
   const navigation = useNavigation();
+
+  const toggleTheme = () => {
+    setTheme(theme.dark ? LightTheme : DarkTheme);
+    setIsEnabled((previousState) => !previousState);
+  };
+
+  // 2) create a dynamic style object
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   // logout
   const handleLogout = async () => {
     await AsyncStorage.removeItem("@auth");
     await AsyncStorage.removeItem("storedImages");
     await AsyncStorage.removeItem("storedBiodata");
     setState({ token: "", user: null });
-    alert("logout successfully");
+    Alert.alert("Logged out", "You have been logged out successfully!");
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <View style={styles.headerRow}>
           <IconButton
             name="arrow-left"
             size={24}
             color={COLORS.star}
             bgColor={"transparent"}
-            style={{
-              elevation: 0,
-              height: 50,
-              width: 50,
-              borderWidth: 0,
-            }}
+            style={styles.iconBtn}
           />
-
-          <Text
-            style={{
-              fontSize: 18,
-              alignItems: "center",
-              fontWeight: "bold",
-              fontStyle: "",
-              color: "#ff006f",
-              letterSpacing: 2,
-            }}
-          >
-            SETTINGS
-          </Text>
-          <Text style={{ height: 50, width: 50 }}></Text>
+          <Text style={styles.headerTitle}>SETTINGS</Text>
+          <Text style={styles.iconPlaceholder} />
         </View>
       </View>
+      {/* Content */}
       <View style={styles.flatListContainer}>
         <ScrollView contentContainerStyle={styles.scrollView}>
+          {/* Theme Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Select Theme</Text>
+            <View style={styles.themeToggle}>
+              <Text style={styles.themeButtonText}>LIGHT</Text>
+              <Switch
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleTheme}
+                value={isEnabled}
+              />
+              <Text style={styles.themeButtonText}>DARK</Text>
+            </View>
+          </View>
+          {/* Payment Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Payment account</Text>
             <TouchableOpacity style={styles.button}>
               <Text style={styles.buttonText}>Manage pay account</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Contact / Legal Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Contact us</Text>
             <TouchableOpacity style={styles.button}>
@@ -92,6 +103,8 @@ const Setting = () => {
               <Text style={styles.buttonText}>Term of service</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Danger Section */}
           <View style={styles.sectionDanger}>
             <TouchableOpacity style={styles.button} onPress={handleLogout}>
               <Text style={styles.buttonText}>Logout</Text>
@@ -106,66 +119,101 @@ const Setting = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f2f2f2",
-  },
-  header: {
-    justifyContent: "flex-start",
-    padding: 2,
-    borderBottomWidth: 0.5,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-  },
-  flatListContainer: {
-    flex: 1,
-    margin: 5,
-    overflow: "hidden",
-  },
-  scrollView: {
-    paddingHorizontal: 16,
-    marginVertical: 24,
-  },
-  section: {
-    borderWidth: 0.5,
-    borderColor: "#333333",
-    marginBottom: 16,
-    padding: 16,
-    paddingBottom: 0,
-    backgroundColor: "#fff", // Replace with your black-100 equivalent
-    borderRadius: 16,
-  },
-  sectionTitle: {
-    marginBottom: 8,
-    fontWeight: "600",
-    color: "#AAAAAA", // Replace with your gray-100 equivalent
-  },
-  button: {
-    borderWidth: 0.5,
-    borderColor: "#444444", // Replace with your secondary color
-    height: 48,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    backgroundColor: "#f2f2f2",
-  },
-  buttonText: {
-    // color: "#FFFFFF",
-    textAlign: "center",
-  },
-  sectionDanger: {
-    borderWidth: 0.5,
-    borderColor: "#333333",
-    marginBottom: 100,
-    padding: 16,
-    paddingBottom: 0,
-    backgroundColor: "#fff", // Replace with your black-100 equivalent
-    borderRadius: 16,
-  },
-});
-
 export default Setting;
+
+// 3) dynamic style generator
+function createStyles(theme) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      justifyContent: "flex-start",
+      padding: 2,
+      borderBottomWidth: 0.5,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.secondaryBackground,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    iconBtn: {
+      elevation: 0,
+      height: 50,
+      width: 50,
+      borderWidth: 0,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: theme.colors.primary,
+      letterSpacing: 2,
+    },
+    iconPlaceholder: {
+      height: 50,
+      width: 50,
+    },
+    flatListContainer: {
+      flex: 1,
+      margin: 5,
+      overflow: "hidden",
+    },
+    scrollView: {
+      paddingHorizontal: 16,
+      marginVertical: 24,
+    },
+    section: {
+      borderWidth: 0.5,
+      borderColor: theme.colors.border,
+      marginBottom: 16,
+      padding: 16,
+      paddingBottom: 0,
+      backgroundColor: theme.colors.secondaryBackground,
+      borderRadius: 16,
+    },
+    sectionTitle: {
+      marginBottom: 8,
+      fontWeight: "600",
+      color: theme.colors.text,
+    },
+    button: {
+      height: 48,
+      marginBottom: 16,
+      paddingHorizontal: 16,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 0.5,
+      borderRadius: 12,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.background,
+    },
+    themeToggle: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      alignItems: "center",
+    },
+    themeButtonText: {
+      color: theme.colors.text,
+      textAlign: "center",
+      // borderWidth: 1,
+      // borderColor: "red",
+    },
+    buttonText: {
+      color: theme.colors.text,
+      textAlign: "center",
+    },
+    sectionDanger: {
+      borderWidth: 0.5,
+      borderColor: theme.colors.border,
+      marginBottom: 100,
+      padding: 16,
+      paddingBottom: 0,
+      backgroundColor: theme.colors.secondaryBackground,
+      borderRadius: 16,
+    },
+  });
+}

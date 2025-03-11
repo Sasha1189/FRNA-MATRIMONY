@@ -1,5 +1,6 @@
+import React, { useContext, useMemo } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
-import React from "react";
+import { ThemeContext } from "../../context/ThemeContext";
 
 const FormField = ({
   title,
@@ -11,37 +12,45 @@ const FormField = ({
   titleStyle,
   placeholderStyle,
 }) => {
+  const { theme } = useContext(ThemeContext);
+  const styles = useMemo(() => createStyles(theme), [theme]);
   return (
     <View>
-      <Text style={[styles.title, titleStyle]}>{title}</Text>
+      <Text style={styles.title}>{title}</Text>
       <TextInput
         style={[styles.input, otherStyles]}
         value={value}
         placeholder={placeholder}
-        placeholderTextColor={placeholderStyle?.color || "#AAAAAA"}
+        placeholderTextColor={styles.placeholder}
         onChangeText={handleChangeText}
         multiline={multiline}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    // color: "#FFFFFF", // Default title color
-    marginBottom: 8,
-  },
-  input: {
-    // backgroundColor: "#2E2E40",
-    // color: "#FFFFFF",
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-  },
-});
+function createStyles(theme) {
+  return StyleSheet.create({
+    title: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.text,
+      marginBottom: 8,
+    },
+    input: {
+      color: theme.colors.text,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 14,
+      textAlign: "center",
+      borderWidth: 0.5,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.secondaryBackground,
+    },
+    placeholder: {
+      color: theme.colors.text,
+    },
+  });
+}
 
 export default FormField;

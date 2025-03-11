@@ -1,10 +1,11 @@
 // /src/navigation/TabNavigator.js
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeStack from "./HomeStack";
 import ChatStack from "./ChatStack";
 import ProfileStack from "./ProfileStack";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Tab = createBottomTabNavigator();
 const COLORS = {
@@ -14,6 +15,7 @@ const COLORS = {
 };
 
 const TabNavigator = () => {
+  const { theme } = useContext(ThemeContext);
   return (
     <Tab.Navigator
       initialRouteName="HomeTab"
@@ -24,7 +26,7 @@ const TabNavigator = () => {
         tabBarInactiveTintColor: COLORS.like, //"#CDCDE0",
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          backgroundColor: "#fff",
+          backgroundColor: theme.colors.background,
           // "#161622",
           borderTopWidth: 1,
           borderTopColor: "#232533",
@@ -37,7 +39,7 @@ const TabNavigator = () => {
         options={{
           headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
-            <FontAwesome name="user-o" size={size} color={color} />
+            <FontAwesome name="user" size={size} color={color} />
           ),
         }}
       />
@@ -47,7 +49,7 @@ const TabNavigator = () => {
         options={{
           headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
-            <FontAwesome name="heart-o" size={size} color={color} />
+            <FontAwesome name="heart" size={size} color={color} />
           ),
         }}
       />
@@ -57,7 +59,7 @@ const TabNavigator = () => {
         options={{
           headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
-            <FontAwesome name="commenting-o" size={size} color={color} />
+            <FontAwesome name="commenting" size={size} color={color} />
           ),
         }}
       />

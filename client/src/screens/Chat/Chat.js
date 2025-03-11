@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useRef, useContext, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,13 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import io from "socket.io-client";
 import { AuthContext } from "../../context/authContext";
-import Footer from "../../components/Menus/Footer";
-
-const COLORS = {
-  like: "#00eda6",
-  nope: "#ff006f",
-  star: "#07A6FF",
-};
+import { ThemeContext } from "../../context/ThemeContext"; // <-- Import your ThemeContext
 
 const ChatListScreen = ({ navigation }) => {
   const [state] = useContext(AuthContext);
@@ -24,29 +18,38 @@ const ChatListScreen = ({ navigation }) => {
   const [likes, setLikes] = useState([]);
   const [crush, setCrush] = useState([]);
 
-  // Initialize booleans to false or true as needed
+  // Tab states
   const [isMessagesShow, setIsMessagesShow] = useState(true);
   const [isCrushShow, setIsCrushShow] = useState(true);
 
-  // Decide which data to display based on booleans
+  // Decide which data to display
   const flatListData = isMessagesShow ? partners : isCrushShow ? crush : likes;
 
   const socketRef = useRef(null);
 
+  // 1) consume the theme
+  const { theme } = useContext(ThemeContext);
+
+  // 2) dynamic style object
+  const styles = useMemo(
+    () => createStyles(theme, isMessagesShow, isCrushShow),
+    [theme, isMessagesShow, isCrushShow]
+  );
+
   useEffect(() => {
-    // 1. Connect to Socket.IO
-    socketRef.current = io("http://192.168.237.147:8080", {
+    // Connect to Socket.IO
+    socketRef.current = io("http://192.168.150.147:8080", {
       auth: {
         token: state?.token,
       },
     });
 
-    // 2. Listen for the returned partners
+    // Listen for the returned partners
     socketRef.current.on("recentPartners", (users) => {
       setPartners(users);
     });
 
-    // 3. On mount, fetch the list
+    // On mount, fetch the list
     socketRef.current.emit("fetchRecentPartners");
 
     return () => {
@@ -55,7 +58,6 @@ const ChatListScreen = ({ navigation }) => {
   }, [state?.token]);
 
   const goToChatRoom = (user) => {
-    // e.g. navigate to ChatRoom with userId
     navigation.navigate("ChatRoomScreen", {
       otherUserId: user?._id,
       otherUserName: user?.name,
@@ -64,91 +66,31 @@ const ChatListScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-around",
-          }}
-        >
+        <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => setIsMessagesShow(true)}>
-            <Text
-              style={{
-                fontSize: 18,
-                paddingVertical: 10,
-                elevation: 5,
-                alignItems: "center",
-                fontWeight: "bold",
-                color: isMessagesShow ? "#ff006f" : "#ff006f40",
-                letterSpacing: 2,
-              }}
-            >
-              Messages
-            </Text>
+            <Text style={styles.messagesTab}>Messages</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setIsMessagesShow(false)}>
-            <Text
-              style={{
-                fontSize: 18,
-                paddingVertical: 10,
-                elevation: 5,
-                alignItems: "center",
-                fontWeight: "bold",
-                fontStyle: "",
-                color: isMessagesShow ? "#ff006f80" : "#ff006f",
-                letterSpacing: 2,
-              }}
-            >
-              Likes
-            </Text>
+            <Text style={styles.likesTab}>Likes</Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Sub-Tab Row */}
       {!isMessagesShow && (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-evenly",
-          }}
-        >
+        <View style={styles.subTabRow}>
           <TouchableOpacity onPress={() => setIsCrushShow(true)}>
-            <Text
-              style={{
-                fontSize: 14,
-                padding: 8,
-                margin: 5,
-                alignItems: "center",
-                fontWeight: "bold",
-                color: isCrushShow ? "#ff006f" : "#ff006f40",
-                backgroundColor: isCrushShow ? "#00eda6" : null,
-                letterSpacing: 2,
-                borderRadius: 10,
-              }}
-            >
-              CRUSH
-            </Text>
+            <Text style={styles.crushTab}>CRUSH</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setIsCrushShow(false)}>
-            <Text
-              style={{
-                fontSize: 14,
-                padding: 8,
-                margin: 5,
-                alignItems: "center",
-                fontWeight: "bold",
-                color: isCrushShow ? "#ff006f40" : "#ff006f",
-                backgroundColor: isCrushShow ? null : "#00eda6",
-                borderRadius: 10,
-                letterSpacing: 2,
-              }}
-            >
-              LIKES
-            </Text>
+            <Text style={styles.likesSubTab}>LIKES</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Content */}
       <View style={styles.flatListContainer}>
         <FlatList
           data={flatListData}
@@ -159,10 +101,7 @@ const ChatListScreen = ({ navigation }) => {
               onPress={() => goToChatRoom(item)}
             >
               <Image
-                source={
-                  require("../../assets/images/profile.png")
-                  //   { uri: item.image?.imageUrls?.[0] }
-                }
+                source={require("../../assets/images/profile.png")}
                 style={styles.profileImage}
               />
               <View style={styles.profileInfo}>
@@ -177,69 +116,125 @@ const ChatListScreen = ({ navigation }) => {
             </TouchableOpacity>
           )}
           ListEmptyComponent={() => (
-            <View style={{ alignItems: "center", marginTop: 20 }}>
-              <Text>No data found.</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No data found.</Text>
             </View>
           )}
         />
       </View>
-      {/* <View style={styles.footer}>
-        <Footer />
-      </View> */}
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f2f2f2",
-  },
-  header: {
-    justifyContent: "flex-start",
-    padding: 2,
-    borderBottomWidth: 0.5,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-  },
-  flatListContainer: {
-    flex: 1,
-    borderRadius: 10,
-    margin: 5,
-    overflow: "hidden",
-  },
-  profileItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    margin: 2,
-    padding: 8,
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Circular image
-    marginRight: 15,
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  profileName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#222",
-  },
-  profileDetails: {
-    fontSize: 14,
-    color: "#aaa",
-    marginTop: 4,
-  },
-  footer: {
-    justifyContent: "flex-end",
-    padding: 2,
-    borderTopWidth: 0.5,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-  },
-});
-
 export default ChatListScreen;
+
+// 3) dynamic style generator
+function createStyles(theme, isMessagesShow, isCrushShow) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      justifyContent: "flex-start",
+      padding: 2,
+      borderBottomWidth: 0.5,
+      borderColor: "#ccc",
+      backgroundColor: theme.colors.secondaryBackground,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-around",
+    },
+    messagesTab: {
+      fontSize: 18,
+      paddingVertical: 10,
+      elevation: 5,
+      alignItems: "center",
+      fontWeight: "bold",
+      letterSpacing: 2,
+      color: isMessagesShow
+        ? theme.colors.primary
+        : `${theme.colors.primary}80`,
+    },
+    likesTab: {
+      fontSize: 18,
+      paddingVertical: 10,
+      elevation: 5,
+      alignItems: "center",
+      fontWeight: "bold",
+      letterSpacing: 2,
+      color: isMessagesShow
+        ? `${theme.colors.primary}80`
+        : theme.colors.primary,
+    },
+    subTabRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-evenly",
+      backgroundColor: theme.colors.secondaryBackground,
+      paddingVertical: 4,
+    },
+    crushTab: {
+      fontSize: 14,
+      padding: 8,
+      margin: 5,
+      fontWeight: "bold",
+      letterSpacing: 2,
+      borderRadius: 10,
+      color: isCrushShow ? theme.colors.primary : `${theme.colors.primary}40`,
+      backgroundColor: isCrushShow ? theme.colors.like : "transparent",
+    },
+    likesSubTab: {
+      fontSize: 14,
+      padding: 8,
+      margin: 5,
+      fontWeight: "bold",
+      letterSpacing: 2,
+      borderRadius: 10,
+      color: isCrushShow ? `${theme.colors.primary}40` : theme.colors.primary,
+      backgroundColor: isCrushShow ? "transparent" : theme.colors.like,
+    },
+    flatListContainer: {
+      flex: 1,
+      borderRadius: 10,
+      margin: 5,
+      overflow: "hidden",
+    },
+    profileItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      margin: 2,
+      padding: 8,
+      backgroundColor: theme.colors.secondaryBackground,
+      borderRadius: 8,
+    },
+    profileImage: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      marginRight: 15,
+    },
+    profileInfo: {
+      flex: 1,
+    },
+    profileName: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.text,
+    },
+    profileDetails: {
+      fontSize: 14,
+      color: `${theme.colors.text}80`,
+      marginTop: 4,
+    },
+    emptyContainer: {
+      alignItems: "center",
+      marginTop: 20,
+    },
+    emptyText: {
+      color: theme.colors.text,
+    },
+  });
+}

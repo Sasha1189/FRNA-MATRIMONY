@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useRef, useContext, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,25 +10,32 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import IconButton from "../../components/SubComp/IconButton";
 import io from "socket.io-client";
 import { AuthContext } from "../../context/authContext";
+import IconButton from "../../components/SubComp/IconButton";
+import { ThemeContext } from "../../context/ThemeContext"; // <-- import your ThemeContext
 
+const COLORS = {
+  like: "#00eda6",
+  nope: "#ff006f",
+  star: "#07A6FF",
+};
 const ChatRoomScreen = ({ route }) => {
   const [loading, setLoading] = useState(false);
-  const [state] = useContext(AuthContext);
-  const { otherUserId, otherUserName } = route.params;
-  const currentUserId = state?.user?.userId;
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [skip, setSkip] = useState(0);
+
+  const { otherUserId, otherUserName } = route.params;
+  const [state] = useContext(AuthContext);
+  const currentUserId = state?.user?.userId; // or whatever your user ID field is
   const socketRef = useRef(null);
 
-  const COLORS = {
-    like: "#00eda6",
-    nope: "#ff006f",
-    star: "#07A6FF",
-  };
+  // 1) consume the theme
+  const { theme } = useContext(ThemeContext);
+
+  // 2) dynamic style object
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   useEffect(() => {
     // Connect to socket with token
@@ -61,9 +68,9 @@ const ChatRoomScreen = ({ route }) => {
     });
 
     return () => {
-      socketRef.current.disconnect();
+      socketRef.current?.disconnect();
     };
-  }, [otherUserId]);
+  }, [otherUserId, state?.token]);
 
   // Fetch older messages
   const loadOlderMessages = () => {
@@ -84,7 +91,7 @@ const ChatRoomScreen = ({ route }) => {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </SafeAreaView>
     );
   }
@@ -98,18 +105,6 @@ const ChatRoomScreen = ({ route }) => {
           isCurrentUser ? styles.rowRight : styles.rowLeft,
         ]}
       >
-        {/* If it's not current user, show avatar on the left side */}
-        {/* {!isCurrentUser && (
-          <Image
-            source={
-              // item?.userImage
-              //   ? { uri: item?.userImage } :
-              require("../../assets/images/profile.png")
-            }
-            style={styles.avatar}
-          />
-        )} */}
-
         <View
           style={[
             styles.bubble,
@@ -124,82 +119,66 @@ const ChatRoomScreen = ({ route }) => {
             })}
           </Text>
         </View>
-
-        {/* If it IS current user, optionally show an empty space or an avatar on the right */}
-        {/* {isCurrentUser && <View style={{ width: 40 }} />} */}
       </View>
     );
   };
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
+        <View style={styles.headerRow}>
+          <View style={styles.leftHeader}>
+            <TouchableOpacity
+              onPress={() => {
+                // e.g. navigation.goBack()
+              }}
+              style={styles.backIconBtn}
+            >
+              {/* <Image
+                source={require("../../assets/icons/arrow-left.png")}
+                style={styles.iconImage}
+              /> */}
+              <IconButton
+                name="arrow-left"
+                size={20}
+                color={COLORS.star}
+                bgColor={"transparent"}
+                style={{
+                  elevation: 0,
+                  height: 40,
+                  width: 40,
+                  marginRight: 2,
+                  borderWidth: 0,
+                }}
+              />
+            </TouchableOpacity>
+            <Image
+              source={require("../../assets/images/profile.png")}
+              style={styles.userAvatar}
+              resizeMode="contain"
+            />
+            <Text style={styles.headerTitle}>{otherUserName}</Text>
+          </View>
+          <TouchableOpacity style={styles.rightIconBtn}>
             <IconButton
-              name="arrow-left"
-              size={20}
+              name="ellipsis-v"
+              size={24}
               color={COLORS.star}
               bgColor={"transparent"}
               style={{
                 elevation: 0,
-                height: 40,
-                width: 40,
-                marginRight: 2,
+                height: 50,
+                width: 50,
+                marginRight: 5,
                 borderWidth: 0,
               }}
             />
-            <Image
-              source={require("../../assets/images/profile.png")}
-              style={{
-                width: 45,
-                height: 45,
-                borderRadius: 25,
-                marginRight: 10,
-                borderWidth: 0.5,
-                borderColor: "#ff006f",
-              }}
-              resizeMode="contain"
-            />
-            <Text
-              style={{
-                fontSize: 18,
-                alignItems: "center",
-                fontWeight: "bold",
-                fontStyle: "",
-                color: "#ff006f",
-                letterSpacing: 2,
-              }}
-            >
-              {otherUserName}
-            </Text>
-          </View>
-          <IconButton
-            name="ellipsis-v"
-            size={24}
-            color={COLORS.star}
-            bgColor={"transparent"}
-            style={{
-              elevation: 0,
-              height: 50,
-              width: 50,
-              marginRight: 5,
-              borderWidth: 0,
-            }}
-            // handlePress={() => navigation.navigate("SearchScreen")}
-          />
+          </TouchableOpacity>
         </View>
       </View>
+
+      {/* Messages */}
       <View style={styles.flatListContainer}>
         <FlatList
           data={messages}
@@ -207,6 +186,7 @@ const ChatRoomScreen = ({ route }) => {
           renderItem={renderItem}
           style={styles.flatList}
         />
+
         {/* Input row */}
         <View style={styles.inputRow}>
           <TextInput
@@ -214,6 +194,7 @@ const ChatRoomScreen = ({ route }) => {
             value={text}
             onChangeText={setText}
             placeholder="Type a message..."
+            placeholderTextColor={`${theme.colors.text}80`}
           />
           <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
             <Text style={styles.sendButtonText}>Send</Text>
@@ -224,91 +205,136 @@ const ChatRoomScreen = ({ route }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f2f2f2",
-  },
-  header: {
-    justifyContent: "flex-start",
-    padding: 4,
-    borderBottomWidth: 0.5,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-  },
-  flatListContainer: {
-    flex: 1,
-    overflow: "hidden",
-  },
-  flatList: {
-    flex: 1,
-    padding: 12,
-  },
-  inputRow: {
-    flexDirection: "row",
-    padding: 8,
-    borderTopWidth: 0.5,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    marginRight: 8,
-    backgroundColor: "#fff",
-  },
-  sendButton: {
-    backgroundColor: "#07A6FF",
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    justifyContent: "center",
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  messageRow: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    marginVertical: 4,
-  },
-  rowLeft: {
-    justifyContent: "flex-start",
-  },
-  rowRight: {
-    justifyContent: "flex-end",
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 6,
-  },
-  bubble: {
-    maxWidth: "80%",
-    padding: 10,
-    borderRadius: 12,
-  },
-  bubbleLeft: {
-    backgroundColor: "#ff006f1A",
-    borderTopLeftRadius: 0,
-  },
-  bubbleRight: {
-    backgroundColor: "#07A6FF1A",
-    borderTopRightRadius: 0,
-  },
-  bubbleText: {
-    color: "#000",
-  },
-  timestamp: {
-    color: "#888",
-    fontSize: 10,
-    textAlign: "right",
-    marginTop: 4,
-  },
-});
-
 export default ChatRoomScreen;
+
+// 3) dynamic style generator
+function createStyles(theme) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      justifyContent: "flex-start",
+      padding: 4,
+      borderBottomWidth: 0.5,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.secondaryBackground,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    leftHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    backIconBtn: {
+      elevation: 0,
+      height: 40,
+      width: 40,
+      marginRight: 2,
+      borderWidth: 0,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    rightIconBtn: {
+      elevation: 0,
+      height: 50,
+      width: 50,
+      marginRight: 5,
+      borderWidth: 0,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    iconImage: {
+      width: 20,
+      height: 20,
+      tintColor: theme.colors.primary,
+    },
+    userAvatar: {
+      width: 45,
+      height: 45,
+      borderRadius: 25,
+      marginRight: 10,
+      borderWidth: 0.5,
+      borderColor: theme.colors.primary,
+    },
+    headerTitle: {
+      fontSize: 18,
+      alignItems: "center",
+      fontWeight: "bold",
+      color: theme.colors.primary,
+      letterSpacing: 2,
+    },
+    flatListContainer: {
+      flex: 1,
+      overflow: "hidden",
+    },
+    flatList: {
+      flex: 1,
+      padding: 12,
+    },
+    inputRow: {
+      flexDirection: "row",
+      padding: 8,
+      borderTopWidth: 0.5,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.secondaryBackground,
+    },
+    input: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 16,
+      paddingHorizontal: 12,
+      marginRight: 8,
+      backgroundColor: theme.colors.background,
+      color: theme.colors.text,
+    },
+    sendButton: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: 16,
+      paddingHorizontal: 16,
+      justifyContent: "center",
+    },
+    sendButtonText: {
+      color: "#fff",
+      fontWeight: "bold",
+    },
+    messageRow: {
+      flexDirection: "row",
+      alignItems: "flex-end",
+      marginVertical: 4,
+    },
+    rowLeft: {
+      justifyContent: "flex-start",
+    },
+    rowRight: {
+      justifyContent: "flex-end",
+    },
+    bubble: {
+      maxWidth: "80%",
+      padding: 10,
+      borderRadius: 12,
+    },
+    bubbleLeft: {
+      backgroundColor: `${theme.colors.nope}1A`, // e.g. tinted color
+      borderTopLeftRadius: 0,
+    },
+    bubbleRight: {
+      backgroundColor: `${theme.colors.like}1A`,
+      borderTopRightRadius: 0,
+    },
+    bubbleText: {
+      color: theme.colors.text,
+    },
+    timestamp: {
+      color: `${theme.colors.text}80`,
+      fontSize: 10,
+      textAlign: "right",
+      marginTop: 4,
+    },
+  });
+}

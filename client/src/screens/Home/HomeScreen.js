@@ -122,9 +122,6 @@ const HomeScreen = () => {
           windowSize={5}
         />
       </View>
-      {/* <View style={styles.footer}>
-        <Footer />
-      </View> */}
     </SafeAreaView>
   );
 };

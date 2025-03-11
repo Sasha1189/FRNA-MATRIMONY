@@ -7,25 +7,24 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 
-// examples picker
-// const fontStyles = ["normal", "italic"];
-// const [fontStyleIdx, setFontStyleIdx] = useState(0);
-
-{
-  /* <CustomPicker
-  label="Font Style"
-  data={fontStyles}
-  currentIndex={fontStyleIdx}
-  onSelected={setFontStyleIdx}
-/>; */
-}
-// for display/select
-//<Text>fontStyle: fontStyles[fontStyleIdx]</Text>
-
-const CustomPicker = ({ label, data, currentIndex, onSelected }) => {
+const CustomPicker = ({
+  label,
+  data,
+  currentIndex,
+  onSelected,
+  themeStyle,
+}) => {
   return (
     <>
-      <Text style={styles.title}>{label}</Text>
+      <Text
+        style={{
+          fontWeight: "bold",
+          marginVertical: 8,
+          color: themeStyle.colors.text,
+        }}
+      >
+        {label}
+      </Text>
       <View style={styles.wrapperHorizontal}>
         <FlatList
           bounces
@@ -45,7 +44,7 @@ const CustomPicker = ({ label, data, currentIndex, onSelected }) => {
                   <Text
                     style={{
                       textAlign: "center",
-                      color: selected ? "black" : "grey",
+                      color: selected ? themeStyle.colors.text : "grey",
                       fontWeight: selected ? "bold" : "normal",
                     }}
                   >
@@ -69,7 +68,7 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
   },
   paragraph: {
-    color: "#fff",
+    // color: themeStyle.colors.text,
     textDecorationColor: "yellow",
     textShadowColor: "red",
     textShadowRadius: 1,
