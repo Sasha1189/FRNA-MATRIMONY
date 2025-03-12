@@ -38,11 +38,14 @@ const ChatListScreen = ({ navigation }) => {
 
   useEffect(() => {
     // Connect to Socket.IO
-    socketRef.current = io("http://192.168.150.147:8080", {
-      auth: {
-        token: state?.token,
-      },
-    });
+    socketRef.current = io(
+      "https://frna-matrimony-backend-295491417988.asia-south1.run.app",
+      {
+        auth: {
+          token: state?.token,
+        },
+      }
+    );
 
     // Listen for the returned partners
     socketRef.current.on("recentPartners", (users) => {

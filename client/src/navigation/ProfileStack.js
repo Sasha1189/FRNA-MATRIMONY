@@ -11,7 +11,10 @@ const Stack = createNativeStackNavigator();
 
 const ProfileStack = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="Profile"
+    >
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="MyProfile" component={MyProfile} />
       <Stack.Screen name="AddImages" component={AddImages} />

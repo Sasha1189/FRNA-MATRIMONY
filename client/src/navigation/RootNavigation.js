@@ -1,20 +1,20 @@
 import { useColorScheme } from "react-native";
 import React, { useMemo } from "react";
-import ScreenMenu from "./src/navigation/ScreenMenu";
-import { AuthProvider } from "./src/context/authContext";
-import { ThemeProvider } from "./src/context/ThemeContext";
+import ScreenMenu from "./ScreenMenu";
+import { AuthProvider } from "../context/authContext";
+import { ThemeProvider } from "../context/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const RootNavigation = () => {
   const colorScheme = useColorScheme();
-  const theme = useMemo(() => {
-    if (!colorScheme) return DefaultTheme;
-    return colorScheme === "dark" ? DarkTheme : LightTheme;
-  }, [colorScheme]);
+  // const theme = useMemo(() => {
+  //   if (!colorScheme) return DefaultTheme;
+  //   return colorScheme === "dark" ? DarkTheme : DefaultTheme;
+  // }, [colorScheme]);
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider>
           <ScreenMenu />
         </ThemeProvider>
       </AuthProvider>

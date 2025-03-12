@@ -39,11 +39,14 @@ const ChatRoomScreen = ({ route }) => {
 
   useEffect(() => {
     // Connect to socket with token
-    socketRef.current = io("http://192.168.237.147:8080", {
-      auth: {
-        token: state?.token,
-      },
-    });
+    socketRef.current = io(
+      "https://frna-matrimony-backend-295491417988.asia-south1.run.app",
+      {
+        auth: {
+          token: state?.token,
+        },
+      }
+    );
 
     // Join ephemeral room => triggers server to send initial chatHistory
     socketRef.current.emit("joinRoom", otherUserId);

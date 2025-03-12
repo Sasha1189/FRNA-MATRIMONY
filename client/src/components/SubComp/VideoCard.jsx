@@ -18,7 +18,11 @@ const VideoCard = ({ item }) => {
     navigation.navigate("DynymicUserProfile", { item: item });
   };
   const toChatRoom = () => {
-    navigation.navigate("ChatRoomScreen", { otherUserId: item._id });
+    // navigation.navigate("ChatRoomScreen", { otherUserId: item._id });
+    navigation.navigate("ChatTab", {
+      screen: "ChatRoomScreen",
+      params: { otherUserId: item._id },
+    });
   };
   return (
     <View style={styles.cardContainer}>

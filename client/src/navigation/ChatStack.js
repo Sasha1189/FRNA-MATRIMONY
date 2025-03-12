@@ -8,7 +8,10 @@ const Stack = createNativeStackNavigator();
 
 const ChatStack = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="Chat"
+    >
       <Stack.Screen name="Chat" component={ChatListScreen} />
       <Stack.Screen name="ChatRoomScreen" component={ChatRoomScreen} />
     </Stack.Navigator>
