@@ -13,7 +13,12 @@ import IconButton from "../../components/SubComp/IconButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { ThemeContext } from "../../context/ThemeContext"; // <--- import your ThemeContext
+import { firebaseApp } from "../../services/firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage
+import * as ImageManipulator from "expo-image-manipulator";
+import * as FileSystem from "expo-file-system";
 
+const storage = getStorage(firebaseApp); // Initialize Firebase Storage
 const MAX_IMAGES = 4;
 const COLORS = {
   like: "#00eda6",
@@ -23,7 +28,8 @@ const COLORS = {
 
 const AddImages = () => {
   const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedUrls, setUploadedUrls] = useState([]); // Firebase URLs
 
   // 1) consume the theme
   const { theme } = useContext(ThemeContext);
@@ -31,36 +37,37 @@ const AddImages = () => {
   // 2) dynamic style object
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  // Save images to local
-  const saveImagesToLocal = async (imgArr = images) => {
-    try {
-      await AsyncStorage.setItem("storedImages", JSON.stringify(imgArr));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   // Load initial images
   useEffect(() => {
+    // const loadImages = async () => {
+    //   try {
+    //     const storedImages = await AsyncStorage.getItem("storedImages");
+    //     if (storedImages) {
+    //       const parsedImages = JSON.parse(storedImages);
+    //       if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+    //         setImages(parsedImages);
+    //         return;
+    //       }
+    //     }
+    //     // If no valid local data, fetch from server
+    //     const { data } = await axios.get("/images/myImages");
+    //     const userImages = data?.userImages;
+    //     if (userImages) {
+    //       setImages(userImages);
+    //       await AsyncStorage.setItem(
+    //         "storedImages",
+    //         JSON.stringify(userImages)
+    //       );
+    //     }
+    //   } catch (error) {
+    //     console.error("Error loading images:", error);
+    //   }
+    // };
     const loadImages = async () => {
       try {
         const storedImages = await AsyncStorage.getItem("storedImages");
         if (storedImages) {
-          const parsedImages = JSON.parse(storedImages);
-          if (Array.isArray(parsedImages) && parsedImages.length > 0) {
-            setImages(parsedImages);
-            return;
-          }
-        }
-        // If no valid local data, fetch from server
-        const { data } = await axios.get("/images/myImages");
-        const userImages = data?.userImages;
-        if (userImages) {
-          setImages(userImages);
-          await AsyncStorage.setItem(
-            "storedImages",
-            JSON.stringify(userImages)
-          );
+          setImages(JSON.parse(storedImages));
         }
       } catch (error) {
         console.error("Error loading images:", error);
@@ -69,48 +76,108 @@ const AddImages = () => {
     loadImages();
   }, []);
 
-  // Upload to server
-  const Upload = async () => {
-    if (!images.length) {
-      Alert.alert("No Images", "Please select images before uploading.");
-      return;
-    }
-    setLoading(true);
+  // Save images to local
+  const saveImagesToLocal = async (imgArr = images) => {
     try {
-      const { data } = await axios.post("/images/uploadImages", images);
-      await saveImagesToLocal();
-      Alert.alert("Success", "Images uploaded successfully!");
+      await AsyncStorage.setItem("storedImages", JSON.stringify(imgArr));
     } catch (error) {
-      Alert.alert("Error", error.response?.data?.message || "Upload failed.");
-    } finally {
-      setLoading(false);
+      console.error("Error saving images to local:", error);
     }
+  };
+
+  // Function to process image (resize, compress, convert, rename)
+  const processImage = async (uri) => {
+    const fileInfo = await FileSystem.getInfoAsync(uri);
+
+    if (!fileInfo.exists) {
+      throw new Error("File does not exist.");
+    }
+
+    console.log("Original file size:", fileInfo.size / 1024, "KB");
+
+    // Check if file size > 1MB or format is not JPEG
+    if (fileInfo.size > 1024 * 1024 || !uri.endsWith(".jpg")) {
+      console.log("Compressing, converting to JPEG, and renaming...");
+
+      const processedImage = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 1080, height: 1350 } }], // Resize to 512x512
+        { compress: 0.75, format: ImageManipulator.SaveFormat.JPEG } // Compress & convert to JPEG
+      );
+
+      return processedImage.uri; // Return the new file path
+    }
+
+    return uri; // Return original URI if no changes were needed
   };
 
   const openPicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-      selectionLimit: MAX_IMAGES - images.length,
+      mediaTypes: ["images"],
+      allowsEditing: true,
       quality: 1,
     });
 
     if (!result.canceled) {
-      const selectedImages = result.assets.map((asset) => asset.uri);
-      const updatedImages = [...images, ...selectedImages];
-      setImages(updatedImages);
-      saveImagesToLocal(updatedImages);
+      try {
+        const selectedImage = await processImage(result.assets[0].uri);
+        const updatedImages = [...images, selectedImage].slice(0, MAX_IMAGES);
+        setImages(updatedImages);
+        saveImagesToLocal(updatedImages);
+      } catch (error) {
+        console.error("Image processing failed:", error);
+      }
     } else {
-      Alert.alert("Cancelled", "No images were selected.");
+      Alert.alert("Cancelled", "No image was selected.");
     }
   };
 
   const removeImage = async (index) => {
     const updated = images.filter((_, i) => i !== index);
     setImages(updated);
-    await saveImagesToLocal(updated);
+    // await saveImagesToLocal(updated);
     // optionally re-upload if needed
     // await Upload();
+  };
+
+  const uploadImages = async () => {
+    if (!images.length) {
+      Alert.alert("No Images", "Please select images before uploading.");
+      return;
+    }
+    setUploading(true);
+    try {
+      let uploadedImageUrls = [];
+
+      for (const image of images) {
+        const response = await fetch(image.uri);
+        const blob = await response.blob();
+        // const fileName = `${Date.now()}-${image.id}`;
+        const uniqueFilename = `IMG_${new Date()
+          .toISOString()
+          .replace(/[-:.TZ]/g, "")}_${Math.floor(Math.random() * 10000)}.jpg`;
+        const storageRef = ref(
+          storage,
+          `users/user123/profileImages/${uniqueFilename}`
+        );
+        await uploadBytes(storageRef, blob);
+        const downloadURL = await getDownloadURL(storageRef);
+        uploadedUrls.push({ id: image.id, url: downloadURL });
+        blob.close();
+
+        // **Save image locally with the same filename**
+        // const localUri = `${FileSystem.documentDirectory}${uniqueFilename}.jpg`;
+        // await FileSystem.copyAsync({ from: image.uri, to: localUri });
+      }
+
+      // Store URLs in the database
+      // await axios.post("/images/uploadImages", { images: uploadedUrls });
+      Alert.alert("Success", "Images uploaded and saved successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -168,9 +235,9 @@ const AddImages = () => {
           ))}
         </View>
 
-        <TouchableOpacity onPress={Upload} style={styles.uploadButton}>
+        <TouchableOpacity onPress={uploadImages} style={styles.uploadButton}>
           <Text style={styles.uploadButtonText}>
-            {loading ? "Uploading..." : "Upload Images"}
+            {uploading ? "Uploading..." : "Upload Images"}
           </Text>
         </TouchableOpacity>
       </View>
