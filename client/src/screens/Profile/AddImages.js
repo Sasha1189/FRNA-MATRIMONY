@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Text,
+  Animated,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,11 +16,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { ThemeContext } from "../../context/ThemeContext"; // <--- import your ThemeContext
 import { firebaseApp } from "../../services/firebase";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  refFromURL,
+  deleteObject,
+} from "firebase/storage"; // Firebase Storage
 import * as ImageManipulator from "expo-image-manipulator";
 import * as FileSystem from "expo-file-system";
+import { AuthContext } from "../../context/authContext";
 
-const storage = getStorage(firebaseApp); // Initialize Firebase Storage
 const MAX_IMAGES = 4;
 const COLORS = {
   like: "#00eda6",
@@ -28,44 +37,18 @@ const COLORS = {
 
 const AddImages = () => {
   const [images, setImages] = useState([]);
-  const [uploading, setUploading] = useState(false);
-  const [uploadedUrls, setUploadedUrls] = useState([]); // Firebase URLs
-
-  // 1) consume the theme
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(new Animated.Value(0));
+  const [state] = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
-
-  // 2) dynamic style object
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  // Load initial images
   useEffect(() => {
-    // const loadImages = async () => {
-    //   try {
-    //     const storedImages = await AsyncStorage.getItem("storedImages");
-    //     if (storedImages) {
-    //       const parsedImages = JSON.parse(storedImages);
-    //       if (Array.isArray(parsedImages) && parsedImages.length > 0) {
-    //         setImages(parsedImages);
-    //         return;
-    //       }
-    //     }
-    //     // If no valid local data, fetch from server
-    //     const { data } = await axios.get("/images/myImages");
-    //     const userImages = data?.userImages;
-    //     if (userImages) {
-    //       setImages(userImages);
-    //       await AsyncStorage.setItem(
-    //         "storedImages",
-    //         JSON.stringify(userImages)
-    //       );
-    //     }
-    //   } catch (error) {
-    //     console.error("Error loading images:", error);
-    //   }
-    // };
     const loadImages = async () => {
       try {
-        const storedImages = await AsyncStorage.getItem("storedImages");
+        const storedImages = await AsyncStorage.getItem(
+          `storedImages:${state.user?.userId}`
+        );
         if (storedImages) {
           setImages(JSON.parse(storedImages));
         }
@@ -79,51 +62,26 @@ const AddImages = () => {
   // Save images to local
   const saveImagesToLocal = async (imgArr = images) => {
     try {
-      await AsyncStorage.setItem("storedImages", JSON.stringify(imgArr));
+      await AsyncStorage.setItem(
+        `storedImages:${state?.user?.userId}`,
+        JSON.stringify(imgArr)
+      );
     } catch (error) {
       console.error("Error saving images to local:", error);
     }
   };
 
-  // Function to process image (resize, compress, convert, rename)
-  const processImage = async (uri) => {
-    const fileInfo = await FileSystem.getInfoAsync(uri);
-
-    if (!fileInfo.exists) {
-      throw new Error("File does not exist.");
-    }
-
-    console.log("Original file size:", fileInfo.size / 1024, "KB");
-
-    // Check if file size > 1MB or format is not JPEG
-    if (fileInfo.size > 1024 * 1024 || !uri.endsWith(".jpg")) {
-      console.log("Compressing, converting to JPEG, and renaming...");
-
-      const processedImage = await ImageManipulator.manipulateAsync(
-        uri,
-        [{ resize: { width: 1080, height: 1350 } }], // Resize to 512x512
-        { compress: 0.75, format: ImageManipulator.SaveFormat.JPEG } // Compress & convert to JPEG
-      );
-
-      return processedImage.uri; // Return the new file path
-    }
-
-    return uri; // Return original URI if no changes were needed
-  };
-
   const openPicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
-      allowsEditing: true,
       quality: 1,
     });
-
     if (!result.canceled) {
       try {
-        const selectedImage = await processImage(result.assets[0].uri);
+        const localUrl = await processImage(result.assets[0].uri);
+        const selectedImage = { downloadURL: "", localUrl: localUrl };
         const updatedImages = [...images, selectedImage].slice(0, MAX_IMAGES);
         setImages(updatedImages);
-        saveImagesToLocal(updatedImages);
       } catch (error) {
         console.error("Image processing failed:", error);
       }
@@ -131,13 +89,37 @@ const AddImages = () => {
       Alert.alert("Cancelled", "No image was selected.");
     }
   };
+  // Function to process image (resize, compress, convert, rename)
+  const processImage = async (uri) => {
+    const fileInfo = await FileSystem.getInfoAsync(uri);
+    if (!fileInfo.exists) {
+      throw new Error("File does not exist.");
+    }
+    // Check if file size > 1MB or format is not JPEG
+    if (fileInfo.size > 1024 * 1024 || !uri.endsWith(".jpeg")) {
+      console.log("Compressing, converting to JPEG, and renaming...");
 
-  const removeImage = async (index) => {
-    const updated = images.filter((_, i) => i !== index);
-    setImages(updated);
-    // await saveImagesToLocal(updated);
-    // optionally re-upload if needed
-    // await Upload();
+      const processedImage = await ImageManipulator.manipulateAsync(
+        uri,
+        [], // Resize to 512x512
+        { compress: 0.75, format: ImageManipulator.SaveFormat.JPEG } // Compress & convert to JPEG
+      );
+      console.log("processed image", processedImage.uri);
+
+      return processedImage.uri; // Return the new file path
+    }
+    return uri; // Return original URI if no changes were needed
+  };
+
+  const uriToBlob = async (uri) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      return blob;
+    } catch (error) {
+      console.error("Blob conversion failed:", error);
+      throw error;
+    }
   };
 
   const uploadImages = async () => {
@@ -145,41 +127,119 @@ const AddImages = () => {
       Alert.alert("No Images", "Please select images before uploading.");
       return;
     }
-    setUploading(true);
-    try {
-      let uploadedImageUrls = [];
 
-      for (const image of images) {
-        const response = await fetch(image.uri);
-        const blob = await response.blob();
-        // const fileName = `${Date.now()}-${image.id}`;
+    const pendingUploads = images.filter((img) => !img.downloadURL);
+    if (pendingUploads.length === 0) {
+      Alert.alert("All Done", "All selected images are already uploaded.");
+      return;
+    }
+
+    setLoading(true);
+    setProgress(new Animated.Value(0));
+    const storage = getStorage(firebaseApp);
+    let uploadedUrls = [];
+
+    try {
+      // Upload each image and collect Promises
+      const uploadPromises = images.map((image, index) => {
+        if (image.downloadURL !== "") return null; // Already uploaded
         const uniqueFilename = `IMG_${new Date()
           .toISOString()
           .replace(/[-:.TZ]/g, "")}_${Math.floor(Math.random() * 10000)}.jpg`;
         const storageRef = ref(
           storage,
-          `users/user123/profileImages/${uniqueFilename}`
+          `users/${state?.user?.userId}/profileImages/${uniqueFilename}`
         );
-        await uploadBytes(storageRef, blob);
-        const downloadURL = await getDownloadURL(storageRef);
-        uploadedUrls.push({ id: image.id, url: downloadURL });
-        blob.close();
+        return uriToBlob(image.localUrl).then((blob) => {
+          return new Promise((resolve, reject) => {
+            const uploadTask = uploadBytesResumable(storageRef, blob);
+            uploadTask.on(
+              "state_changed",
+              (snapshot) => {
+                const progressPercent =
+                  snapshot.bytesTransferred / snapshot.totalBytes;
+                Animated.timing(progress, {
+                  toValue: progressPercent,
+                  duration: 200,
+                  useNativeDriver: false,
+                }).start();
+              },
+              (error) => {
+                console.error("Upload failed:", error);
+                reject(error);
+              },
+              async () => {
+                const downloadURL = await getDownloadURL(
+                  uploadTask.snapshot.ref
+                );
+                uploadedUrls.push(downloadURL);
+                image.downloadURL = downloadURL;
+                resolve(downloadURL);
+              }
+            );
+          });
+        });
+      });
 
-        // **Save image locally with the same filename**
-        // const localUri = `${FileSystem.documentDirectory}${uniqueFilename}.jpg`;
-        // await FileSystem.copyAsync({ from: image.uri, to: localUri });
+      // Wait for all uploads to finish
+      await Promise.all(uploadPromises.filter(Boolean));
+      saveImagesToLocal(images); // ✅ Save with downloadURL updates
+      // Now send to backend
+      try {
+        await axios.post("/images/uploadImages", uploadedUrls);
+        Alert.alert("Success", "Images uploaded successfully!");
+      } catch (error) {
+        console.error("Failed to upload URLs to DB:", error);
+        // 🧽 Clean up uploaded images from Firebase
+        for (const url of uploadedUrls) {
+          deleteImage(url); // Assuming this is defined
+        }
+        Alert.alert(
+          "Upload Failed",
+          "Images were uploaded but failed to save. Please try again."
+        );
       }
-
-      // Store URLs in the database
-      // await axios.post("/images/uploadImages", { images: uploadedUrls });
-      Alert.alert("Success", "Images uploaded and saved successfully!");
     } catch (error) {
+      console.error("Upload failed:", error);
       Alert.alert("Error", "Upload failed.");
     } finally {
-      setUploading(false);
+      setLoading(false);
+      setTimeout(() => setProgress(new Animated.Value(0)), 1000);
     }
   };
 
+  const deleteImage = async (downloadURL) => {
+    const storage = getStorage(firebaseApp);
+    // Extract the path from the download URL
+    const decodedURL = decodeURIComponent(downloadURL);
+    const storagePath = decodedURL.substring(
+      decodedURL.indexOf("/o/") + 3,
+      decodedURL.indexOf("?")
+    );
+    const imagePath = storagePath.replace(/%2F/g, "/");
+    // Create a reference
+    const imageRef = ref(storage, imagePath);
+    try {
+      await deleteObject(imageRef);
+      Alert.alert("Success", "Image deleted successfully.");
+    } catch (error) {
+      Alert.alert("Error", "Failed to delete image.");
+    }
+  };
+
+  const removeImage = async (index) => {
+    setLoading(true);
+    try {
+      await deleteImage(images[index]?.downloadURL);
+      const updated = images.filter((_, i) => i !== index);
+      setImages(updated);
+      await saveImagesToLocal(updated);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -196,22 +256,19 @@ const AddImages = () => {
           <Text style={styles.iconPlaceholder} />
         </View>
       </View>
-
-      {/* Content */}
       <View style={styles.flatListContainer}>
         <View style={styles.contentHeaderName}>
           <Text style={styles.contentHeaderText}>
             Add your profile photos here...
           </Text>
         </View>
-
         <View style={styles.contentContainer}>
           {Array.from({ length: MAX_IMAGES }).map((_, index) => (
             <View key={index} style={styles.imageWrapper}>
               {images[index] ? (
                 <View style={styles.imageContainer}>
                   <Image
-                    source={{ uri: images[index] }}
+                    source={{ uri: images[index].localUrl }}
                     style={styles.thumbnailImage}
                     resizeMode="cover"
                   />
@@ -228,26 +285,34 @@ const AddImages = () => {
                     source={require("../../assets/icons/upload.png")}
                     style={styles.uploadIcon}
                   />
-                  <Text style={styles.uploadText}>Choose a file</Text>
+                  <Text style={styles.uploadText}>Click to Choose a Image</Text>
                 </TouchableOpacity>
               )}
             </View>
           ))}
         </View>
-
-        <TouchableOpacity onPress={uploadImages} style={styles.uploadButton}>
+        <TouchableOpacity
+          onPress={uploadImages}
+          style={styles.uploadButton}
+          disabled={loading}
+          activeOpacity={loading ? 1 : 0.7} // disable press animation when uploading
+        >
           <Text style={styles.uploadButtonText}>
-            {uploading ? "Uploading..." : "Upload Images"}
+            {loading ? "Uploading..." : "Upload Images"}
           </Text>
         </TouchableOpacity>
       </View>
+      {loading && (
+        <View style={styles.overlay}>
+          <ActivityIndicator size="large" color="#FFA500" />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
 
 export default AddImages;
 
-// 3) the dynamic style generator
 function createStyles(theme) {
   return StyleSheet.create({
     container: {
@@ -360,18 +425,29 @@ function createStyles(theme) {
       textAlign: "center",
     },
     uploadButton: {
-      backgroundColor: "#FF8C42",
-      padding: 12,
-      width: "80%",
-      marginHorizontal: "10%",
-      marginBottom: 50,
-      borderRadius: 16,
+      backgroundColor: "#FF9800", // Fallback color (initial)
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      borderRadius: 10,
       alignItems: "center",
+      justifyContent: "center",
+      marginTop: 24,
+      overflow: "hidden", // 🔥 Required to clip animated fill
+      elevation: 3, // subtle shadow
+      position: "relative", // for absoluteFill to work correctly
     },
     uploadButtonText: {
-      color: "#FFFFFF",
-      fontSize: 18,
-      fontWeight: "600",
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 16,
+      zIndex: 1,
+    },
+    overlay: {
+      ...StyleSheet.absoluteFillObject, // full screen
+      backgroundColor: "rgba(255, 255, 255, 0.6)", // transparent white overlay
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 10, // make sure it's above everything
     },
   });
 }

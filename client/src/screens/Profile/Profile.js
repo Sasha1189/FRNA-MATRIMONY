@@ -26,7 +26,6 @@ const Profile = () => {
   const { theme } = useContext(ThemeContext); // 1) consume the theme
 
   const navigation = useNavigation();
-  const route = useRoute();
 
   // 2) create dynamic style object
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -79,7 +78,7 @@ const Profile = () => {
           <View style={styles.profileImageContainer}>
             {images.length > 0 ? (
               <Image
-                source={{ uri: images[0] }}
+                source={{ uri: images[0].localUrl }}
                 style={styles.profileImage}
                 resizeMode="cover"
               />

@@ -18,7 +18,7 @@ const TabNavigator = () => {
   const { theme } = useContext(ThemeContext);
   return (
     <Tab.Navigator
-      initialRouteName="HomeTab"
+      initialRouteName="HomeStack"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
@@ -44,7 +44,7 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="HomeTab"
+        name="HomeStack"
         component={HomeStack}
         options={{
           headerShown: false,
