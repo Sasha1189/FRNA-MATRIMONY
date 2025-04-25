@@ -10,11 +10,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import IconButton from "../../components/SubComp/IconButton";
-import { AuthContext } from "../../context/authContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { LightTheme, DarkTheme } from "../../themes";
+import { signOut } from "firebase/auth";
+import { auth } from "../../services/firebase";
 
 const COLORS = {
   like: "#00eda6",
@@ -23,7 +23,6 @@ const COLORS = {
 };
 
 const Setting = () => {
-  const [state, setState] = useContext(AuthContext);
   const [isEnabled, setIsEnabled] = useState(false);
   const { theme, setTheme } = useContext(ThemeContext);
   const navigation = useNavigation();
@@ -36,13 +35,17 @@ const Setting = () => {
   // 2) create a dynamic style object
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  // logout
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem("@auth");
-    await AsyncStorage.removeItem("storedImages");
-    await AsyncStorage.removeItem("storedBiodata");
-    setState({ token: "", user: null });
-    Alert.alert("Logged out", "You have been logged out successfully!");
+  const logout = async () => {
+    try {
+      await signOut(auth); // This will trigger onAuthStateChanged to clean up state
+      Alert.alert("Logged out", "You have been logged out successfully!");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Register" }], // Replace with your login screen name
+      });
+    } catch (error) {
+      console.error("Logout error:", error.message);
+    }
   };
 
   return (
@@ -106,7 +109,7 @@ const Setting = () => {
 
           {/* Danger Section */}
           <View style={styles.sectionDanger}>
-            <TouchableOpacity style={styles.button} onPress={handleLogout}>
+            <TouchableOpacity style={styles.button} onPress={logout}>
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button}>

@@ -1,150 +1,137 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import InputBox from "../../components/Common/InputBox";
-import SubmitButton from "../../components/SubComp/SubmitButton";
-import axios from "axios";
-
-const genders = ["Male", "Female"];
+// screens/Register.js
+import React, { useRef, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+// import * as PhoneNumber from "expo-sms-retriever";
+import { PhoneAuthProvider } from "firebase/auth";
+import { auth } from "../../services/firebase";
 
 const Register = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [gender, setGender] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [phone, setPhone] = useState("");
+  const recaptchaVerifier = useRef(null);
 
-  //function
-  // Register button function..
-  const handleSubmit = async () => {
+  const handlePhoneChange = (text) => {
+    const cleaned = text.replace(/[^0-9]/g, "").slice(0, 10);
+    setPhone(cleaned);
+  };
+
+  const sendOtp = async () => {
+    const fullPhone = `+91${phone}`; // 🔥 CHANGED: Ensure proper format
     try {
-      setLoading(true);
-      if (!name || !email || !password || !gender) {
-        Alert.alert("Please fill all fields");
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
-      //send data to server
-      const { data } = await axios.post("/auth/register", {
-        name,
-        email,
-        password,
-        gender,
+      const provider = new PhoneAuthProvider(auth);
+      const verificationId = await provider.verifyPhoneNumber(
+        fullPhone,
+        recaptchaVerifier.current
+      );
+      navigation.navigate("OTPVerify", {
+        phone: fullPhone,
+        verificationId,
       });
-      alert(data && data.message);
-      navigation.navigate("Login");
-      console.log("Registration data", { name, email, password, gender });
-    } catch (error) {
-      alert(error.response.data.message);
-      setLoading(fasle);
-      console.log(error);
+    } catch (err) {
+      Alert.alert("Failed to send OTP", err.message);
     }
   };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.pageTitle}>Register to our lonari community</Text>
-      <View style={{ marginHorizontal: 20 }}>
-        <InputBox inputTitle={"Name"} value={name} setValue={setName} />
-        <InputBox
-          inputTitle={"Email"}
-          keyboardType="email-address"
-          autoComplete="email"
-          value={email}
-          setValue={setEmail}
-        />
-        <InputBox
-          inputTitle={"Password"}
-          secureTextEntry={true}
-          autoComplete="password"
-          value={password}
-          setValue={setPassword}
-        />
-        <Text style={styles.genderTitle}>Gender</Text>
-        <View style={styles.dropdownContainer}>
-          <Picker
-            selectedValue={gender}
-            onValueChange={(value) => setGender(value)}
-            style={styles.picker}
-            dropdownIconColor="#808080"
-          >
-            <Picker.Item
-              label="Select gender"
-              value=""
-              style={styles.placeholderLabel}
-            />
-            {genders.map((status) => (
-              <Picker.Item key={status} label={status} value={status} />
-            ))}
-          </Picker>
-        </View>
-      </View>
-      <SubmitButton
-        btnTitle={"Register"}
-        loading={loading}
-        handleSubmit={handleSubmit}
+    <SafeAreaView style={styles.container}>
+      <FirebaseRecaptchaVerifierModal
+        ref={recaptchaVerifier}
+        firebaseConfig={auth.app.options}
       />
-      <Text style={styles.linkText}>
-        Already registered Please{"  "}
-        <Text
-          style={styles.link}
-          onPress={() => {
-            navigation.navigate("Login");
-          }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <Text style={styles.title}>Welcome to Lonari Community</Text>
+        <View style={styles.inputContainer}>
+          <Text style={styles.prefix}>+91</Text>
+          <TextInput
+            placeholder="Enter your phone number"
+            keyboardType="phone-pad"
+            value={phone}
+            onChangeText={handlePhoneChange}
+            style={styles.input}
+            maxLength={10}
+          />
+        </View>
+        <TouchableOpacity
+          onPress={() => sendOtp()}
+          style={[
+            styles.button,
+            { backgroundColor: phone.length === 10 ? "#ffa500" : "#ccc" },
+          ]}
+          disabled={phone.length !== 10}
         >
-          LogIn
+          <Text style={styles.buttonText}>Continue</Text>
+        </TouchableOpacity>
+        <Text style={styles.terms}>
+          By continuing, you agree to our Terms & Privacy Policy.
         </Text>
-      </Text>
-    </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    backgroundColor: "#e1d5c9",
+    backgroundColor: "#fffef5",
+    padding: 24,
+    justifyContent: "flex-end",
+    borderWidth: 1,
+    borderColor: "#333",
   },
-  pageTitle: {
-    fontSize: 30,
+  title: {
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  inputBox: {
-    height: 50,
-    marginBottom: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    marginTop: 10,
-    paddingLeft: 10,
-    color: "#af9f85",
-  },
-  genderTitle: {
-    marginBottom: 10,
-  },
-  dropdownContainer: {
-    marginBottom: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  picker: {
-    color: "#010101", // Label color for selected value
-    fontSize: 14,
-    height: 50,
-    width: "100%",
-  },
-  placeholderLabel: {
-    color: "#888888", // Light gray for the placeholder
-    fontSize: 14,
-  },
-  linkText: {
+    marginBottom: 50,
     textAlign: "center",
   },
-  link: {
-    color: "red",
+  inputContainer: {
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    paddingHorizontal: 12,
+    marginBottom: 20,
   },
+  prefix: {
+    fontSize: 16,
+    marginRight: 6,
+    fontWeight: "bold",
+    color: "#333", // 🔥 NEW: Style for +91
+    letterSpacing: 1,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    letterSpacing: 3,
+  },
+  button: {
+    height: 50,
+    backgroundColor: "#ffa500",
+    borderRadius: 10,
+    justifyContent: "center",
+  },
+  buttonText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  terms: { fontSize: 12, marginTop: 20, textAlign: "center", color: "#555" },
 });
 
 export default Register;

@@ -9,7 +9,7 @@ const Stack = createNativeStackNavigator();
 const ScreenMenu = () => {
   const [state] = useContext(AuthContext);
   const authenticatedUser = state?.user && state?.token;
-
+  
   return authenticatedUser ? <TabNavigator /> : <AuthStack />;
 };
 

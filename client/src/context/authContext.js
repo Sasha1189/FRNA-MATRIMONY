@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../services/firebase";
 import axios from "axios";
 
 //context
@@ -20,12 +21,17 @@ const AuthProvider = ({ children }) => {
 
   //Initial local storage data
   useEffect(() => {
-    const loadLocalStorageData = async () => {
-      let data = await AsyncStorage.getItem("@auth");
-      let loginData = JSON.parse(data);
-      setState({ ...state, user: loginData?.user, token: loginData?.token });
-    };
-    loadLocalStorageData();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const token = await user.getIdToken();
+        setState({ user: user.uid, token });
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      } else {
+        setState({ ...state, user: null, token: "" });
+        delete axios.defaults.headers.common["Authorization"];
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   return (

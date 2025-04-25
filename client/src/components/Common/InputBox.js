@@ -3,6 +3,8 @@ import React from "react";
 
 const InputBox = ({
   inputTitle,
+  placeholder,
+  placeholderTextColor,
   keyboardType,
   autoComplete,
   secureTextEntry = false,
@@ -14,6 +16,8 @@ const InputBox = ({
       <Text>{inputTitle}</Text>
       <TextInput
         style={styles.inputBox}
+        placeholder={placeholder}
+        placeholderTextColor={placeholderTextColor}
         autoCorrect={false}
         keyboardType={keyboardType}
         autoComplete={autoComplete}
