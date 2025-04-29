@@ -19,7 +19,7 @@ import axios from "axios";
 import VideoCard from "../../components/SubComp/VideoCard";
 import EmptyList from "../../components/SubComp/EmptyList";
 import Footer from "../../components/Menus/Footer";
-import { AuthContext } from "../../context/authContext";
+import { useAuth } from "../../context/authContext";
 import HeaderIcons from "../../components/Menus/HeaderIcons";
 
 const { height, width } = Dimensions.get("window");
@@ -34,7 +34,7 @@ const HomeScreen = () => {
   // If filterParams is undefined or null, we fetch all profiles
   const filterParams = route.params?.filterParams || null;
 
-  const [state] = useContext(AuthContext);
+  const { authState } = useAuth();
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);

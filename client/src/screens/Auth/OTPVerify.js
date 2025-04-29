@@ -1,4 +1,3 @@
-// screens/OTPVerify.js
 import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   View,
@@ -12,6 +11,7 @@ import {
   TextInput,
   Platform,
   Keyboard,
+  ToastAndroid,
   BackHandler,
 } from "react-native";
 import {
@@ -21,21 +21,26 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 import { auth, db } from "../../services/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { AuthContext } from "../../context/authContext";
+import { useAuth } from "../../context/authContext";
+import axios from "axios";
 // import RNSmsRetriever from "react-native-sms-retriever";
 
 const CODE_LENGTH = 6;
 
 const OTPVerify = ({ route, navigation }) => {
-  const { verificationId, phone } = route.params;
-  const [state, setState] = useContext(AuthContext);
+  const { verificationId:initialVerificationId, phone } = route.params;
+  const { authState } = useAuth();
+
+  const [verificationId, setVerificationId] = useState(initialVerificationId)
   const [code, setCode] = useState("");
-  const [timer, setTimer] = useState(120);
+  const [timer, setTimer] = useState(60);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
+  const [verifying, setVerifying] = useState(false);
+
   const inputRef = useRef();
+
   const recaptchaVerifier = useRef(null);
 
   useEffect(() => {
@@ -50,7 +55,7 @@ const OTPVerify = ({ route, navigation }) => {
   }, [timer]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => setTimer(0), 120000);
+    const timeout = setTimeout(() => setTimer(0), 60000);
     const interval = setInterval(() => {
       setTimer((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
@@ -67,51 +72,54 @@ const OTPVerify = ({ route, navigation }) => {
     }
   }, [code]);
 
+  useEffect(() => {
+    if (authState.user) {
+      navigation.replace("HomeScreen");
+    }
+  }, [authState.user]);
+
   const verifyCode = async () => {
     try {
       setError("");
       setLoading(true);
+
+       if (verifying) return; // Prevent double verify
+        setVerifying(true);
+
       const credential = PhoneAuthProvider.credential(verificationId, code);
       const result = await signInWithCredential(auth, credential);
-      const { uid } = result?.user;
-      const userDocRef = doc(db, "users", uid);
-      const userDocSnap = await getDoc(userDocRef);
+      
+      console.log("Verified User:",result?.user);
+
+      const { uid, phoneNumber } = result?.user;
       const token = await result?.user?.getIdToken();
 
-      if (!userDocSnap.exists()) {
-        await setDoc(userDocRef, { uid });
-      }
+    try {
+    await axios.post("/users/create-user", { uid, phoneNumber, token });
+    navigation.replace("HomeScreen");
+    } catch (apiError) {
+    console.error("API error:", apiError);
+    handleError(apiError);  // show user-friendly error
+    }
 
-      setState({
-        user: uid,
-        token: token,
-      });
-
-      if (state.user) {
-        navigation.navigate("HomeScreen");
-      }
     } catch (error) {
       console.log("OTP verification error:", error.message);
-      if (error.code === "auth/code-expired") {
-        setError("OTP expired. Please resend the code.");
-      } else if (error.code === "auth/invalid-verification-code") {
-        setError("Invalid OTP. Please try again.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      handleError(error)
     } finally {
       setLoading(false);
+      setVerifying(false)
     }
   };
 
   const handleResend = async () => {
     try {
       setCode("");
-      setTimer(120);
+      setTimer(60);
       setError("");
       setLoading(true);
 
-      const appVerifier = recaptchaVerifier.current;
+      const appVerifier = undefined;
+
       const confirmationResult = await signInWithPhoneNumber(
         auth,
         phone,
@@ -119,7 +127,7 @@ const OTPVerify = ({ route, navigation }) => {
       );
 
       if (confirmationResult.verificationId) {
-        route.params.verificationId = confirmationResult.verificationId;
+        setVerificationId(confirmationResult.verificationId);
         setResendMessage("Code sent again!"); // ✨ Set feedback message
         setTimeout(() => setResendMessage(""), 5000);
       }
@@ -128,6 +136,23 @@ const OTPVerify = ({ route, navigation }) => {
       Alert.alert("Error", "Failed to resend OTP. Try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleError = (error) => {
+    if (error.code === "auth/code-expired") {
+      setError("OTP expired. Please resend the code.");
+    } else if (error.code === "auth/invalid-verification-code") {
+      setError("Invalid OTP. Please try again.");
+    } else {
+      const errorMessage = error.response?.data?.message || "Something went wrong. Please try again.";
+      setError(errorMessage);
+
+      if (Platform.OS === "android") {
+        ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+      } else {
+        Alert.alert("Error", errorMessage);
+      }
     }
   };
 
