@@ -26,7 +26,7 @@ import {
 } from "firebase/storage"; // Firebase Storage
 import * as ImageManipulator from "expo-image-manipulator";
 import * as FileSystem from "expo-file-system";
-import { AuthContext } from "../../context/authContext";
+import { useAuth } from "../../context/authContext";
 
 const MAX_IMAGES = 4;
 const COLORS = {
@@ -39,7 +39,7 @@ const AddImages = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(new Animated.Value(0));
-  const [state] = useContext(AuthContext);
+  const { authState } = useAuth();
   const { theme } = useContext(ThemeContext);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -47,7 +47,7 @@ const AddImages = () => {
     const loadImages = async () => {
       try {
         const storedImages = await AsyncStorage.getItem(
-          `storedImages:${state.user?.userId}`
+          `storedImages:${authState.user?.userId}`
         );
         if (storedImages) {
           setImages(JSON.parse(storedImages));
@@ -63,7 +63,7 @@ const AddImages = () => {
   const saveImagesToLocal = async (imgArr = images) => {
     try {
       await AsyncStorage.setItem(
-        `storedImages:${state?.user?.userId}`,
+        `storedImages:${authState?.user?.userId}`,
         JSON.stringify(imgArr)
       );
     } catch (error) {
@@ -148,7 +148,7 @@ const AddImages = () => {
           .replace(/[-:.TZ]/g, "")}_${Math.floor(Math.random() * 10000)}.jpg`;
         const storageRef = ref(
           storage,
-          `users/${state?.user?.userId}/profileImages/${uniqueFilename}`
+          `users/${authState?.user?.userId}/profileImages/${uniqueFilename}`
         );
         return uriToBlob(image.localUrl).then((blob) => {
           return new Promise((resolve, reject) => {

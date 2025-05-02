@@ -26,3 +26,14 @@ const storage = getStorage(app);
 // const analytics = getAnalytics(app);
 export { auth, db, storage };
 export default app;
+
+// import { initializeApp } from "firebase/app";
+// import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+
+// const app = initializeApp(firebaseConfig);
+// const db = getFirestore(app);
+
+// // Enable offline persistence
+// enableIndexedDbPersistence(db).catch((err) => {
+//   console.error("Firestore persistence error:", err);
+// });

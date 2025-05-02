@@ -1,14 +1,15 @@
-import React, { useContext } from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
 import { useAuth } from "../context/authContext";
 import AuthStack from "./AuthStack";
 import TabNavigator from "./TabNavigator";
-
-const Stack = createNativeStackNavigator();
+import LoadingScreen from "../components/SubComp/LoadingScreen";
 
 const ScreenMenu = () => {
   const { authState } = useAuth();
+
   const authenticatedUser = authState?.user && authState?.token;
+
+  if (authState.loading) return <LoadingScreen />;
 
   return authenticatedUser ? <TabNavigator /> : <AuthStack />;
 };

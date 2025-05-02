@@ -10,11 +10,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import IconButton from "../../components/SubComp/IconButton";
-import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { LightTheme, DarkTheme } from "../../themes";
-import { signOut } from "firebase/auth";
-import { auth } from "../../services/firebase";
+import { useAuth } from "../../context/authContext"; // <-- Import your auth context
 
 const COLORS = {
   like: "#00eda6",
@@ -24,8 +22,8 @@ const COLORS = {
 
 const Setting = () => {
   const [isEnabled, setIsEnabled] = useState(false);
+  const { logout, deleteAccount } = useAuth();
   const { theme, setTheme } = useContext(ThemeContext);
-  const navigation = useNavigation();
 
   const toggleTheme = () => {
     setTheme(theme.dark ? LightTheme : DarkTheme);
@@ -35,19 +33,16 @@ const Setting = () => {
   // 2) create a dynamic style object
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  const logout = async () => {
+  const handleDeleteAccount = async () => {
     try {
-      await signOut(auth); // This will trigger onAuthStateChanged to clean up state
-      Alert.alert("Logged out", "You have been logged out successfully!");
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Register" }], // Replace with your login screen name
-      });
+      await deleteAccount();
+      // Optionally: show success alert
+      Alert.alert("Deleted", "Your account has been deleted.");
+      // Optionally: navigate to Welcome/Login screen
     } catch (error) {
-      console.error("Logout error:", error.message);
+      Alert.alert("Error", error.message);
     }
   };
-
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -112,7 +107,10 @@ const Setting = () => {
             <TouchableOpacity style={styles.button} onPress={logout}>
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleDeleteAccount}
+            >
               <Text style={styles.buttonText}>Delete account</Text>
             </TouchableOpacity>
           </View>

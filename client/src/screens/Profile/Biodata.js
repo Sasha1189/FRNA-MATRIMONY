@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
+import { useAuth } from "../../context/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
@@ -67,7 +68,9 @@ const COLORS = {
 
 const Biodata = () => {
   const [loading, setLoading] = useState(false);
+  const { authState } = useAuth();
   const [form, setForm] = useState({
+    uid: authState.user || "",
     fullname: "",
     aboutme: "",
     education: "",
@@ -80,16 +83,18 @@ const Biodata = () => {
     maritalStatus: "",
     familyDetails: "",
     partnerExpectations: "",
+    gender: "", // <--- Added
+    dob: "",
   });
 
   // 1) Get the theme from context
   const { theme } = useContext(ThemeContext);
-
   // 2) Create a dynamic StyleSheet that depends on `theme`
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   // Utility to filter data
   const filterProfileData = (profileData) => ({
+    uid: profileData.uid || authState.user,
     fullname: profileData.fullname || "",
     aboutme: profileData.aboutme || "",
     education: profileData.education || "",
@@ -102,6 +107,8 @@ const Biodata = () => {
     maritalStatus: profileData.maritalStatus || "",
     familyDetails: profileData.familyDetails || "",
     partnerExpectations: profileData.partnerExpectations || "",
+    gender: profileData.gender || "", // <-- added
+    dob: profileData.dob || "",
   });
 
   // Load local or server biodata
@@ -160,9 +167,14 @@ const Biodata = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      const { data } = await axios.post("/profile/updateProfile", form);
-      setForm(data);
-      await saveBiodataToLocal();
+      const { data } = await axios.post("/profiles/update-profile", form);
+      const { userData } = await axios.post("/users/", form.gender);
+      if (data?.status !== "success") {
+        Alert.alert("Error", data?.message || "Update failed.");
+        return;
+      }
+      // setForm(data);
+      // await saveBiodataToLocal();
       Alert.alert("Success", "Biodata updated successfully!");
     } catch (error) {
       console.error("API Error:", error.response?.data || error.message);
@@ -253,6 +265,49 @@ const Biodata = () => {
                 />
               </View>
             ))}
+
+            <View style={styles.fieldContainer}>
+              <Text style={styles.title}>Gender</Text>
+              <View style={styles.dropdownContainer}>
+                <Picker
+                  selectedValue={form.gender}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, gender: value }))
+                  }
+                  style={styles.picker}
+                  dropdownIconColor="#808080"
+                >
+                  <Picker.Item
+                    label="Select gender"
+                    value=""
+                    style={styles.placeholderLabel}
+                  />
+                  <Picker.Item
+                    label="Male"
+                    value="Male"
+                    style={styles.placeholderLabel}
+                  />
+                  <Picker.Item
+                    label="Female"
+                    value="Female"
+                    style={styles.placeholderLabel}
+                  />
+                </Picker>
+              </View>
+            </View>
+
+            {/* Date of Birth Field */}
+            <View style={styles.fieldContainer}>
+              <FormField
+                title="Date of Birth"
+                value={form.dob}
+                placeholder="YYYY-MM-DD"
+                handleChangeText={(value) =>
+                  setForm((prev) => ({ ...prev, dob: value }))
+                }
+                keyboardType="default"
+              />
+            </View>
 
             {/* Income Dropdown */}
             <View style={styles.fieldContainer}>

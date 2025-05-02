@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import IconButton from "../../components/SubComp/IconButton";
-import { AuthContext } from "../../context/authContext";
+import { useAuth } from "../../context/authContext";
 import { ThemeContext } from "../../context/ThemeContext"; // <-- Import your ThemeContext
 
 const COLORS = {
@@ -22,7 +22,7 @@ const COLORS = {
 
 const Profile = () => {
   const [images, setImages] = useState([]);
-  const [state] = useContext(AuthContext);
+  const { authState } = useAuth();
   const { theme } = useContext(ThemeContext); // 1) consume the theme
 
   const navigation = useNavigation();
@@ -91,10 +91,10 @@ const Profile = () => {
             )}
           </View>
           <Text style={styles.profileName}>
-            {state?.user?.name
+            {/* {authState?.user
               ?.toLowerCase()
-              .replace(/\b\w/g, (char) => char.toUpperCase())}
-            , 23
+              .replace(/\b\w/g, (char) => char.toUpperCase())} */}
+            Sachin, 23
           </Text>
         </TouchableOpacity>
 

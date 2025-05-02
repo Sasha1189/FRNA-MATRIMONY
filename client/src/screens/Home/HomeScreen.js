@@ -5,6 +5,8 @@ import {
   StyleSheet,
   Dimensions,
   ActivityIndicator,
+  Modal,
+  Pressable,
 } from "react-native";
 import React, {
   useEffect,
@@ -13,31 +15,35 @@ import React, {
   useCallback,
   useRef,
 } from "react";
+import GenderModal from "../../components/Menus/Modal";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRoute, useNavigationState } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import VideoCard from "../../components/SubComp/VideoCard";
 import EmptyList from "../../components/SubComp/EmptyList";
-import Footer from "../../components/Menus/Footer";
 import { useAuth } from "../../context/authContext";
 import HeaderIcons from "../../components/Menus/HeaderIcons";
+// import { useNavigation } from "@react-navigation/native";
 
 const { height, width } = Dimensions.get("window");
 const ITEM_HEIGHT = height * 0.9; // Fixed height per card
 
 const HomeScreen = () => {
   const route = useRoute();
-  const state1 = useNavigationState((state) => state);
-  const screenCount = state1?.routes?.length ?? 0;
-  console.log(screenCount);
+  const navigation = useNavigation();
+  // const state1 = useNavigationState((state) => state);
+  // const screenCount = state1?.routes?.length ?? 0;
+  // console.log(screenCount);
 
   // If filterParams is undefined or null, we fetch all profiles
   const filterParams = route.params?.filterParams || null;
 
   const { authState } = useAuth();
   const [profiles, setProfiles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  console.log("Auth State gender:", authState.gender);
 
   // Single fetch function to handle normal or filtered requests
   const fetchProfiles = useCallback(async () => {
@@ -62,8 +68,28 @@ const HomeScreen = () => {
   }, [filterParams]);
 
   useEffect(() => {
-    fetchProfiles();
+    // fetchProfiles();
   }, [fetchProfiles]);
+
+  useEffect(() => {
+    if (
+      authState &&
+      authState.gender !== "male" &&
+      authState.gender !== "female"
+    ) {
+      setShowModal(true);
+    }
+  }, [authState.gender]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (showModal) {
+        e.preventDefault();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, showModal]);
 
   const handleViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -101,6 +127,8 @@ const HomeScreen = () => {
       <View style={styles.header}>
         <HeaderIcons />
       </View>
+      {/* ✅ MODAL UI */}
+      <GenderModal visible={showModal} onClose={() => setShowModal(false)} />
       <View style={styles.flatListContainer}>
         <FlatList
           data={profiles}
