@@ -7,8 +7,8 @@ export const fetchAndCacheUserData = async (uid, phoneNumber, displayName) => {
     const cached = await AsyncStorage.getItem(`user_${uid}`);
     if (cached) {
       const parced = JSON.parse(cached);
-      if (parced === "male" || parced === "female") return parced;
       console.log("Cache hit:", parced);
+      if (parced.gender === "male" || parced.gender === "female") return parced;
     }
 
     // Fallback to API
