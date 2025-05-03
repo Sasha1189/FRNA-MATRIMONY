@@ -5,16 +5,9 @@ import {
   StyleSheet,
   Dimensions,
   ActivityIndicator,
-  Modal,
-  Pressable,
+  InteractionManager,
 } from "react-native";
-import React, {
-  useEffect,
-  useContext,
-  useState,
-  useCallback,
-  useRef,
-} from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import GenderModal from "../../components/Menus/Modal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, useNavigation } from "@react-navigation/native";
@@ -44,6 +37,25 @@ const HomeScreen = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
   console.log("Auth State gender:", authState.gender);
+
+  const [renderTime, setRenderTime] = useState(null);
+  const startTime = Date.now();
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      const endTime = Date.now();
+      setRenderTime(endTime - startTime);
+      console.log(`Screen rendered in ${endTime - startTime} ms`);
+    });
+
+    return () => task.cancel(); // cleanup if needed
+  }, []);
+  const renderCount = useRef(0);
+  renderCount.current += 1;
+
+  if (__DEV__) {
+    console.log(`Homescreen render count: ${renderCount.current}`);
+  }
 
   // Single fetch function to handle normal or filtered requests
   const fetchProfiles = useCallback(async () => {

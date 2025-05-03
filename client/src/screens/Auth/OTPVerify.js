@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Text,
   StyleSheet,
@@ -12,6 +12,7 @@ import {
   Keyboard,
   ToastAndroid,
   BackHandler,
+  InteractionManager,
 } from "react-native";
 import {
   PhoneAuthProvider,
@@ -19,8 +20,6 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 import { auth } from "../../services/firebase";
-import { useAuth } from "../../context/authContext";
-import axios from "axios";
 // import RNSmsRetriever from "react-native-sms-retriever";
 
 const CODE_LENGTH = 6;
@@ -36,6 +35,25 @@ const OTPVerify = ({ route, navigation }) => {
   const [verifying, setVerifying] = useState(false);
 
   const inputRef = useRef();
+  const [renderTime, setRenderTime] = useState(null);
+  const startTime = Date.now();
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      const endTime = Date.now();
+      setRenderTime(endTime - startTime);
+      console.log(`Screen rendered in ${endTime - startTime} ms`);
+    });
+
+    return () => task.cancel(); // cleanup if needed
+  }, []);
+
+  const renderCount = useRef(0);
+  renderCount.current += 1;
+
+  if (__DEV__) {
+    console.log(`otp screen render count: ${renderCount.current}`);
+  }
 
   // const recaptchaVerifier = useRef(null);
 

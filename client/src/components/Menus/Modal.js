@@ -23,13 +23,15 @@ const GenderModal = ({ visible, onClose }) => {
     console.log(gender);
 
     try {
-      const genderData = await axios.post("/users/create-user", {
-        uid: authState?.user?.uid,
-        phoneNumber: authState?.user?.phoneNumber,
-        newGender: gender,
-      });
+      await axios.post("/users/update-user", gender);
 
       updateAuthState({ gender: gender });
+
+      // 2️⃣ Also overwrite the local cache so next fetch sees the new gender
+      await AsyncStorage.setItem(
+        `user_${authState.user.uid}`,
+        JSON.stringify(updatedUser)
+      );
 
       onClose();
 

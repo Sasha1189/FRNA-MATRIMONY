@@ -1,26 +1,35 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-export const fetchAndCacheUserData = async (uid) => {
+export const fetchAndCacheUserData = async (uid, phoneNumber, displayName) => {
   try {
     // First try cache
     const cached = await AsyncStorage.getItem(`user_${uid}`);
-    const data = JSON.parse(cached);
-    console.log("Cached user data:", data);
-
-    if (data && data.gender) return JSON.parse(cached);
+    if (cached) {
+      const parced = JSON.parse(cached);
+      if (parced === "male" || parced === "female") return parced;
+      console.log("Cache hit:", parced);
+    }
 
     // Fallback to API
     const res = await axios.get(`/users/${uid}`);
-
-    if (!res.data) throw new Error("No user data returned from API");
-    console.log("Fetched user data from API:", res.data);
-
-    // Cache it
+    console.log(" hit axios res", res.data);
     await AsyncStorage.setItem(`user_${uid}`, JSON.stringify(res.data));
-
     return res.data;
   } catch (err) {
+    // If user not found, create it
+    if (
+      err.response?.status === 404 &&
+      err.response.data?.message === "User not found."
+    ) {
+      const newUser = { uid, phoneNumber, displayName, gender: null };
+      // create on backend
+      const crt = await axios.post(`/users/create-user`, newUser);
+      const userToCache = crt.data || newUser;
+      await AsyncStorage.setItem(`user_${uid}`, JSON.stringify(userToCache));
+      return userToCache;
+    }
+    // other errors bubble up
     console.error("Error fetching user data:", err);
     return null;
   }

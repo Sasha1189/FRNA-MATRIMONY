@@ -272,7 +272,7 @@
 // export default Register;
 
 // screens/Register.js
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -282,6 +282,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  InteractionManager,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
@@ -303,6 +304,25 @@ const Register = ({ navigation }) => {
   //   isPremium: false,
   // });
   const recaptchaVerifier = useRef(null);
+  const [renderTime, setRenderTime] = useState(null);
+  const startTime = Date.now();
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      const endTime = Date.now();
+      setRenderTime(endTime - startTime);
+      console.log(`Screen rendered in ${endTime - startTime} ms`);
+    });
+
+    return () => task.cancel(); // cleanup if needed
+  }, []);
+
+  const renderCount = useRef(0);
+  renderCount.current += 1;
+
+  if (__DEV__) {
+    console.log(`Register render count: ${renderCount.current}`);
+  }
 
   const handlePhoneChange = (text) => {
     const cleaned = text.replace(/[^0-9]/g, "").slice(0, 10);

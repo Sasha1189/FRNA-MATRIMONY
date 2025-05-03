@@ -6,6 +6,7 @@ import LoadingScreen from "../components/SubComp/LoadingScreen";
 
 const ScreenMenu = () => {
   const { authState } = useAuth();
+  console.log("ScreenMenu screen authState", authState);
 
   const authenticatedUser = authState?.user && authState?.token;
 

@@ -1,12 +1,19 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  createContext,
+  useRef,
+  useMemo,
+} from "react";
 import { fetchAndCacheUserData } from "../services/userService";
 import { onIdTokenChanged, deleteUser } from "firebase/auth";
-import { getdoc, doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc } from "firebase/firestore";
 import { auth, db, storage } from "../services/firebase";
 import axios from "axios";
 import safeAsync from "../utils/safeAsync";
 
-axios.defaults.baseURL = "http://192.168.181.147:8000/api/v1";
+axios.defaults.baseURL = "http://192.168.240.147:8000/api/v1";
 const AuthContext = createContext({
   authState: {
     user: {
@@ -36,6 +43,13 @@ const AuthProvider = ({ children }) => {
     loading: true,
   });
 
+  const renderCount = useRef(0);
+  renderCount.current += 1;
+
+  if (__DEV__) {
+    console.log(`AuthContext screen count: ${renderCount.current}`);
+  }
+
   // Firebase Auth State listener
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
@@ -46,28 +60,31 @@ const AuthProvider = ({ children }) => {
             null,
             "Get Token"
           );
-
           const uid = firebaseUser.uid;
+          const phoneNumber = firebaseUser.phoneNumber;
+          const displayName = firebaseUser.displayName;
+
+          console.log("token from authcontext screen:");
 
           const userData = await safeAsync(
-            fetchAndCacheUserData(uid),
+            fetchAndCacheUserData(uid, phoneNumber, displayName),
             null,
             "Fetch User Data"
           );
+          console.log("userData from fn fetchAndCacheUserData :", userData);
 
           const gender = userData?.gender ?? null;
 
-          setAuthState((prev) => ({
-            ...prev,
+          setAuthState({
             user: {
               uid,
-              phoneNumber: firebaseUser.phoneNumber,
-              displayName: firebaseUser.displayName,
+              phoneNumber,
+              displayName,
             },
             token,
             gender,
             loading: false,
-          }));
+          });
         } catch (err) {
           console.warn("Auth init error:", err);
           setAuthState({
@@ -182,13 +199,13 @@ const AuthProvider = ({ children }) => {
     }));
   };
 
-  return (
-    <AuthContext.Provider
-      value={{ authState, logout, deleteAccount, updateAuthState }}
-    >
-      {children}
-    </AuthContext.Provider>
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(
+    () => ({ authState, logout, deleteAccount, updateAuthState }),
+    [authState, logout, deleteAccount, updateAuthState]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export { AuthProvider, useAuth };
