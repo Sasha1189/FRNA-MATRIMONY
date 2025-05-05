@@ -4,25 +4,31 @@ import {
   Text,
   StyleSheet,
   TextInput,
+  Keyboard,
   TouchableOpacity,
   KeyboardAvoidingView,
+  ActivityIndicator,
+  BackHandler,
   Platform,
   Alert,
   InteractionManager,
 } from "react-native";
+import { PhoneAuthProvider, signInWithCredential } from "firebase/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
-// import * as PhoneNumber from "expo-sms-retriever";
-import { PhoneAuthProvider } from "firebase/auth";
 import { auth } from "../../services/firebase";
+import OTPVerify from "./OTPVerify";
+// import * as PhoneNumber from "expo-sms-retriever";
 
-const Register = ({ navigation }) => {
+const Register = () => {
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [verificationId, setVerificationId] = useState(null);
   const recaptchaVerifier = useRef(null);
+  const inputRef = useRef();
 
   const renderCount = useRef(0);
   renderCount.current += 1;
-
   if (__DEV__) {
     console.log(`Register render count: ${renderCount.current}`);
   }
@@ -40,14 +46,22 @@ const Register = ({ navigation }) => {
         fullPhone,
         recaptchaVerifier.current
       );
-      navigation.navigate("OTPVerify", {
-        phone: fullPhone,
-        verificationId,
-      });
+      setVerificationId(verificationId);
+      // navigation.navigate("OTPVerify", {
+      //   phone: fullPhone,
+      //   verificationId,
+      // });
     } catch (err) {
       Alert.alert("Failed to send OTP", err.message);
     }
   };
+
+  useEffect(() => {
+    if (phone.length === 10) {
+      Keyboard.dismiss();
+      sendOtp();
+    }
+  }, [phone]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -64,14 +78,18 @@ const Register = ({ navigation }) => {
           <Text style={styles.prefix}>+91</Text>
           <TextInput
             placeholder="Enter your phone number"
-            keyboardType="phone-pad"
+            keyboardType="number-pad"
+            // autoFocus
             value={phone}
             onChangeText={handlePhoneChange}
             style={styles.input}
             maxLength={10}
           />
         </View>
-        <TouchableOpacity
+
+        <OTPVerify verificationId={verificationId} />
+
+        {/* <TouchableOpacity
           onPress={() => sendOtp()}
           style={[
             styles.button,
@@ -81,9 +99,10 @@ const Register = ({ navigation }) => {
         >
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
+
         <Text style={styles.terms}>
           By continuing, you agree to our Terms & Privacy Policy.
-        </Text>
+        </Text> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -107,7 +126,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   inputContainer: {
-    height: 50,
+    height: 45,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
@@ -115,7 +134,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#fff",
     paddingHorizontal: 12,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   prefix: {
     fontSize: 16,
@@ -128,26 +147,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     letterSpacing: 3,
-  },
-  button: {
-    height: 50,
-    backgroundColor: "#ffa500",
-    borderRadius: 10,
-    justifyContent: "center",
-  },
-  buttonText: {
-    textAlign: "center",
-    fontSize: 18,
-    color: "#fff",
-    fontWeight: "bold",
-    letterSpacing: 1,
-  },
-  terms: {
-    fontSize: 12,
-    marginTop: 20,
-    textAlign: "center",
-    color: "#555",
-    letterSpacing: 0.5,
   },
 });
 

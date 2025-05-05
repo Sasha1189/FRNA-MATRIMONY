@@ -7,7 +7,13 @@ import {
   ActivityIndicator,
   InteractionManager,
 } from "react-native";
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import GenderModal from "../../components/Menus/Modal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, useNavigation } from "@react-navigation/native";
@@ -81,11 +87,11 @@ const HomeScreen = () => {
     }
   }, [filterParams]);
 
-  useEffect(() => {
-    if (user?.displayName === "male" || user?.displayName === "female") {
-      fetchProfiles();
-    }
-  }, [user?.displayNmae, fetchProfiles]);
+  // useEffect(() => {
+  //   if (user?.displayName === "male" || user?.displayName === "female") {
+  //     fetchProfiles();
+  //   }
+  // }, [user?.displayNmae, fetchProfiles]);
 
   useEffect(() => {
     if (
