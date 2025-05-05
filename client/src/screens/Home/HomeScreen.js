@@ -36,20 +36,20 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  console.log("Auth State gender:", authState.gender);
+  console.log("HomeScreen AuthState-phone:", authState?.user?.phoneNumber);
 
   const [renderTime, setRenderTime] = useState(null);
   const startTime = Date.now();
 
-  useEffect(() => {
-    const task = InteractionManager.runAfterInteractions(() => {
-      const endTime = Date.now();
-      setRenderTime(endTime - startTime);
-      console.log(`Screen rendered in ${endTime - startTime} ms`);
-    });
+  // useEffect(() => {
+  //   const task = InteractionManager.runAfterInteractions(() => {
+  //     const endTime = Date.now();
+  //     setRenderTime(endTime - startTime);
+  //     console.log(`Screen rendered in ${endTime - startTime} ms`);
+  //   });
 
-    return () => task.cancel(); // cleanup if needed
-  }, []);
+  //   return () => task.cancel(); // cleanup if needed
+  // }, []);
   const renderCount = useRef(0);
   renderCount.current += 1;
 
@@ -79,9 +79,9 @@ const HomeScreen = () => {
     }
   }, [filterParams]);
 
-  useEffect(() => {
-    // fetchProfiles();
-  }, [fetchProfiles]);
+  // useEffect(() => {
+  //   // fetchProfiles();
+  // }, [fetchProfiles]);
 
   useEffect(() => {
     if (
@@ -91,7 +91,7 @@ const HomeScreen = () => {
     ) {
       setShowModal(true);
     }
-  }, [authState.gender]);
+  }, []);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {

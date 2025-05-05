@@ -106,7 +106,7 @@ const OTPVerify = ({ route, navigation }) => {
       const result = await signInWithCredential(auth, credential);
       const token = await result?.user?.getIdToken();
 
-      console.log("From verify screen:", token);
+      // console.log("From verify screen:", token);
       // navigation.replace("HomeScreen");
     } catch (error) {
       console.log("OTP verification error:", error.message);

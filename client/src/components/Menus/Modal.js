@@ -1,4 +1,4 @@
-// components/GenderModal.js
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
   Text,
@@ -23,14 +23,14 @@ const GenderModal = ({ visible, onClose }) => {
     console.log(gender);
 
     try {
-      await axios.post("/users/update-user", gender);
+      await axios.post("/users/update-user", { gender });
 
       updateAuthState({ gender: gender });
 
       // 2️⃣ Also overwrite the local cache so next fetch sees the new gender
       await AsyncStorage.setItem(
         `user_${authState.user.uid}`,
-        JSON.stringify(updatedUser)
+        JSON.stringify(authState)
       );
 
       onClose();

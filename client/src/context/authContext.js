@@ -7,11 +7,13 @@ import React, {
   useMemo,
 } from "react";
 import { fetchAndCacheUserData } from "../services/userService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onIdTokenChanged, deleteUser } from "firebase/auth";
 import { doc, deleteDoc } from "firebase/firestore";
 import { auth, db, storage } from "../services/firebase";
 import axios from "axios";
 import safeAsync from "../utils/safeAsync";
+import { Alert } from "react-native";
 
 axios.defaults.baseURL = "http://192.168.240.147:8000/api/v1";
 const AuthContext = createContext({
@@ -54,27 +56,18 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        const uid = firebaseUser.uid;
+        const phoneNumber = firebaseUser.phoneNumber;
+        const displayName = firebaseUser.displayName;
         try {
-          const token = await safeAsync(
-            firebaseUser.getIdToken(),
-            null,
-            "Get Token"
+          const token = await firebaseUser.getIdToken();
+          const genderData = await fetchAndCacheUserData(
+            uid,
+            phoneNumber,
+            displayName
           );
-          const uid = firebaseUser.uid;
-          const phoneNumber = firebaseUser.phoneNumber;
-          const displayName = firebaseUser.displayName;
-
-          console.log("token from authcontext screen:");
-
-          const userData = await safeAsync(
-            fetchAndCacheUserData(uid, phoneNumber, displayName),
-            null,
-            "Fetch User Data"
-          );
-          console.log("userData from fn fetchAndCacheUserData :", userData);
-
-          const gender = userData?.gender ?? null;
-
+          console.log("userData from fn fetchAndCacheUserData :", genderData);
+          const gender = genderData ?? null;
           setAuthState({
             user: {
               uid,
@@ -85,20 +78,22 @@ const AuthProvider = ({ children }) => {
             gender,
             loading: false,
           });
+          await AsyncStorage.setItem(`user_${uid}`, JSON.stringify(authState));
         } catch (err) {
           console.warn("Auth init error:", err);
           setAuthState({
             user: {
-              uid: null,
-              phoneNumber: null,
-              displayName: null,
+              uid,
+              phoneNumber,
+              displayName,
             },
-            token: null,
+            token,
             gender: null,
             loading: false, // prevent infinite loading
           });
         }
       } else {
+        Alert.alert("Soemething went wrong", "Please try again later.");
         setAuthState({
           user: {
             uid: null,
