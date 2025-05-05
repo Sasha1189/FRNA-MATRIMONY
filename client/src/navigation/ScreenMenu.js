@@ -7,7 +7,6 @@ import LoadingScreen from "../components/SubComp/LoadingScreen";
 const ScreenMenu = () => {
   const { user } = useAuth();
   console.log("ScreenMenu screen user:", user?.uid || null);
-  // if(user === undefined) return null; // Prevents the app from crashing when user is undefined
 
   if (user === undefined) return <LoadingScreen />;
 

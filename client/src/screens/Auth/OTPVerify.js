@@ -39,15 +39,15 @@ const OTPVerify = ({ route, navigation }) => {
   const startTime = Date.now();
   console.log("OTPVerify screen startTime", startTime);
 
-  useEffect(() => {
-    const task = InteractionManager.runAfterInteractions(() => {
-      const endTime = Date.now();
-      setRenderTime(endTime - startTime);
-      console.log(`Screen rendered in ${endTime - startTime} ms`);
-    });
+  // useEffect(() => {
+  //   const task = InteractionManager.runAfterInteractions(() => {
+  //     const endTime = Date.now();
+  //     setRenderTime(endTime - startTime);
+  //     console.log(`Screen rendered in ${endTime - startTime} ms`);
+  //   });
 
-    return () => task.cancel(); // cleanup if needed
-  }, []);
+  //   return () => task.cancel(); // cleanup if needed
+  // }, []);
 
   const renderCount = useRef(0);
   renderCount.current += 1;
@@ -77,16 +77,16 @@ const OTPVerify = ({ route, navigation }) => {
     return () => backHandler.remove();
   }, [timer]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setTimer(0), 60000);
-    const interval = setInterval(() => {
-      setTimer((prev) => (prev <= 1 ? 0 : prev - 1));
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => setTimer(0), 60000);
+  //   const interval = setInterval(() => {
+  //     setTimer((prev) => (prev <= 1 ? 0 : prev - 1));
+  //   }, 1000);
+  //   return () => {
+  //     clearInterval(interval);
+  //     clearTimeout(timeout);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (code.length === CODE_LENGTH) {

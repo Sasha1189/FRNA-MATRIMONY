@@ -64,6 +64,7 @@ const GenderModal = ({ visible, onClose }) => {
       await axios.post(`/users/create-user`, newUser);
     } catch (error) {
       console.error("Error creating user in backend:", error);
+      throw error;
     }
   };
 

@@ -81,9 +81,11 @@ const HomeScreen = () => {
     }
   }, [filterParams]);
 
-  // useEffect(() => {
-  //   // fetchProfiles();
-  // }, [fetchProfiles]);
+  useEffect(() => {
+    if (user?.displayName === "male" || user?.displayName === "female") {
+      fetchProfiles();
+    }
+  }, [user?.displayNmae, fetchProfiles]);
 
   useEffect(() => {
     if (
@@ -104,6 +106,13 @@ const HomeScreen = () => {
 
     return unsubscribe;
   }, [navigation, showModal]);
+
+  const viewabilityConfig = useMemo(
+    () => ({
+      itemVisiblePercentThreshold: 80,
+    }),
+    []
+  );
 
   const handleViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -153,9 +162,7 @@ const HomeScreen = () => {
           decelerationRate="fast"
           showsVerticalScrollIndicator={false}
           onViewableItemsChanged={handleViewableItemsChanged}
-          viewabilityConfig={{
-            itemVisiblePercentThreshold: 80, // Image considered "active" when 80% visible
-          }}
+          viewabilityConfig={viewabilityConfig}
           ListEmptyComponent={() => <EmptyList title="No Profiles Found" />}
           contentContainerStyle={{ paddingTop: 0, paddingBottom: 80 }} // CHANGE: Add bottom padding
           getItemLayout={getItemLayout} // CHANGE: Use getItemLayout for performance
