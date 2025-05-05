@@ -1,4 +1,5 @@
 import React, { useContext, useMemo, useState } from "react";
+import { getAuth, signOut } from "firebase/auth";
 import {
   View,
   Text,
@@ -22,7 +23,6 @@ const COLORS = {
 
 const Setting = () => {
   const [isEnabled, setIsEnabled] = useState(false);
-  const { logout, deleteAccount } = useAuth();
   const { theme, setTheme } = useContext(ThemeContext);
 
   const toggleTheme = () => {
@@ -33,14 +33,13 @@ const Setting = () => {
   // 2) create a dynamic style object
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  const handleDeleteAccount = async () => {
+  const logout = async () => {
+    const auth = getAuth();
     try {
-      await deleteAccount();
-      // Optionally: show success alert
-      Alert.alert("Deleted", "Your account has been deleted.");
-      // Optionally: navigate to Welcome/Login screen
+      await signOut(auth);
+      console.log("User signed out");
     } catch (error) {
-      Alert.alert("Error", error.message);
+      console.error("Logout error:", error);
     }
   };
   return (
@@ -109,7 +108,7 @@ const Setting = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={handleDeleteAccount}
+              // onPress={handleDeleteAccount}
             >
               <Text style={styles.buttonText}>Delete account</Text>
             </TouchableOpacity>

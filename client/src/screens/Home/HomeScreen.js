@@ -22,6 +22,7 @@ const { height, width } = Dimensions.get("window");
 const ITEM_HEIGHT = height * 0.9; // Fixed height per card
 
 const HomeScreen = () => {
+  const { user } = useAuth();
   const route = useRoute();
   const navigation = useNavigation();
   // const state1 = useNavigationState((state) => state);
@@ -31,25 +32,26 @@ const HomeScreen = () => {
   // If filterParams is undefined or null, we fetch all profiles
   const filterParams = route.params?.filterParams || null;
 
-  const { authState } = useAuth();
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  console.log("HomeScreen AuthState-phone:", authState?.user?.phoneNumber);
+  console.log("HomeScreen AuthState-phone:", user?.phoneNumber);
 
   const [renderTime, setRenderTime] = useState(null);
   const startTime = Date.now();
 
-  // useEffect(() => {
-  //   const task = InteractionManager.runAfterInteractions(() => {
-  //     const endTime = Date.now();
-  //     setRenderTime(endTime - startTime);
-  //     console.log(`Screen rendered in ${endTime - startTime} ms`);
-  //   });
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      const endTime = Date.now();
+      console.log("HomeScreen screen endTime", endTime);
+      setRenderTime(endTime - startTime);
+      console.log(`Screen rendered in ${endTime - startTime} ms`);
+    });
 
-  //   return () => task.cancel(); // cleanup if needed
-  // }, []);
+    return () => task.cancel(); // cleanup if needed
+  }, []);
+
   const renderCount = useRef(0);
   renderCount.current += 1;
 
@@ -85,9 +87,9 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (
-      authState &&
-      authState.gender !== "male" &&
-      authState.gender !== "female"
+      user &&
+      user?.displayName !== "male" &&
+      user?.displayName !== "female"
     ) {
       setShowModal(true);
     }

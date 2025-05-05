@@ -37,6 +37,7 @@ const OTPVerify = ({ route, navigation }) => {
   const inputRef = useRef();
   const [renderTime, setRenderTime] = useState(null);
   const startTime = Date.now();
+  console.log("OTPVerify screen startTime", startTime);
 
   useEffect(() => {
     const task = InteractionManager.runAfterInteractions(() => {
@@ -104,10 +105,6 @@ const OTPVerify = ({ route, navigation }) => {
 
       const credential = PhoneAuthProvider.credential(verificationId, code);
       const result = await signInWithCredential(auth, credential);
-      const token = await result?.user?.getIdToken();
-
-      // console.log("From verify screen:", token);
-      // navigation.replace("HomeScreen");
     } catch (error) {
       console.log("OTP verification error:", error.message);
       handleError(error);

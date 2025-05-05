@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAuth, updateProfile } from "firebase/auth";
 import {
   View,
   Text,
@@ -8,40 +8,62 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, setTimeout } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/authContext";
 import LoadingScreen from "../SubComp/LoadingScreen";
 
 const GenderModal = ({ visible, onClose }) => {
-  const { authState, updateAuthState } = useAuth();
+  const { setUser } = useAuth();
   const [gender, setGender] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [retry, setRetry] = useState(false);
 
-  const handleGenderSelect = async () => {
+  const updateFirebaseUser = async () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    if (!gender) {
+      Alert.alert("Select Gender", "Please select a gender before updating.");
+      return;
+    }
     setLoading(true);
-    console.log(gender);
+    setRetry(false);
 
     try {
-      await axios.post("/users/update-user", { gender });
+      if (!currentUser?.displayName) {
+        await updateProfile(currentUser, {
+          displayName: gender,
+        });
+        await currentUser.reload();
+      }
 
-      updateAuthState({ gender: gender });
-
-      // 2️⃣ Also overwrite the local cache so next fetch sees the new gender
-      await AsyncStorage.setItem(
-        `user_${authState.user.uid}`,
-        JSON.stringify(authState)
-      );
-
-      onClose();
+      setUser(auth.currentUser);
+      await createUser(auth.currentUser);
 
       Alert.alert(
-        "Success",
-        "Gender updated successfully...Later update your complete profile"
+        "Done!",
+        "Gender updated successfully. You can now complete your profile."
       );
+      onClose();
     } catch (error) {
+      console.error("Update failed:", error);
+      setRetry(true);
+    } finally {
       setLoading(false);
-      console.error("Error updating gender:", error);
+    }
+  };
+
+  const createUser = async (firebaseUser) => {
+    try {
+      const newUser = {
+        uid: firebaseUser.uid,
+        phoneNumber: firebaseUser.phoneNumber,
+        displayName: firebaseUser.displayName,
+      };
+      // create on backend
+      await axios.post(`/users/create-user`, newUser);
+    } catch (error) {
+      console.error("Error creating user in backend:", error);
     }
   };
 
@@ -72,13 +94,18 @@ const GenderModal = ({ visible, onClose }) => {
               <Text style={styles.modalButtonText}>Female</Text>
             </Pressable>
           </View>
-          <TouchableOpacity style={styles.modalButtonUpdate}>
-            <Text
-              style={styles.modalButtonText}
-              onPress={() => handleGenderSelect()}
-            >
-              {!loading ? "Update" : "Updating" && <LoadingScreen />}
-            </Text>
+          <TouchableOpacity
+            style={styles.modalButtonUpdate}
+            onPress={updateFirebaseUser}
+            disabled={loading || !gender}
+          >
+            {loading ? (
+              <LoadingScreen />
+            ) : (
+              <Text style={styles.modalButtonText}>
+                {retry ? "Try Again" : "Update"}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
