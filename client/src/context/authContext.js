@@ -9,7 +9,7 @@ import React, {
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
 
-axios.defaults.baseURL = "http://192.168.240.147:8000/api/v1";
+axios.defaults.baseURL = "http://192.168.174.171:8000/api/v1";
 const AuthContext = createContext({ user: null });
 const useAuth = () => useContext(AuthContext);
 

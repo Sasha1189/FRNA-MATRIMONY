@@ -17,7 +17,7 @@ import { PhoneAuthProvider, signInWithCredential } from "firebase/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { auth } from "../../services/firebase";
-import OTPVerify from "./OTPVerify";
+// import OTPVerify from "./OTPVerify";
 // import * as PhoneNumber from "expo-sms-retriever";
 
 const Register = () => {
@@ -46,11 +46,9 @@ const Register = () => {
         fullPhone,
         recaptchaVerifier.current
       );
+      console.log(verificationId);
+
       setVerificationId(verificationId);
-      // navigation.navigate("OTPVerify", {
-      //   phone: fullPhone,
-      //   verificationId,
-      // });
     } catch (err) {
       Alert.alert("Failed to send OTP", err.message);
     }
@@ -87,9 +85,9 @@ const Register = () => {
           />
         </View>
 
-        <OTPVerify verificationId={verificationId} />
+        {/* <OTPVerify verificationId={verificationId} /> */}
 
-        {/* <TouchableOpacity
+        <TouchableOpacity
           onPress={() => sendOtp()}
           style={[
             styles.button,
@@ -102,7 +100,7 @@ const Register = () => {
 
         <Text style={styles.terms}>
           By continuing, you agree to our Terms & Privacy Policy.
-        </Text> */}
+        </Text>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -147,6 +145,26 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     letterSpacing: 3,
+  },
+  button: {
+    height: 45,
+    backgroundColor: "#ffa500",
+    borderRadius: 10,
+    justifyContent: "center",
+  },
+  buttonText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
+    letterSpacing: 1,
+  },
+  terms: {
+    fontSize: 12,
+    marginTop: 10,
+    textAlign: "center",
+    color: "#555",
+    letterSpacing: 0.5,
   },
 });
 
